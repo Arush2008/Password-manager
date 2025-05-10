@@ -4,4 +4,4 @@ views = Blueprint("views")
 
 @views.route("/")
 def home():
-    return "home page"
+    return "This is the home page"
