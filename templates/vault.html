@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://site-assets.fontawesome.com/releases/v6.7.2/css/all.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+  </head>
+  <body class="vault_page">
+    <!-- Top Bar -->
+    <div class="top_part">
+      <div class="top-left">
+        <a href="{{ url_for('views.index') }}" class="logo-page2">webi</a>
+        <div class="search-bar">
+          <input type="text" placeholder="Search..." />
+          <button type="submit">Search</button>
+        </div>
+      </div>
+      <div class="top-right">
+        <button class="icon-button notification">
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <button class="icon-button settings">
+          <i class="fa-regular fa-gear"></i>
+        </button>
+        <div class="profile-avatar">A</div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Top Content of Sidebar -->
+      <div class="sidebar-content">
+        <div class="sidebar_titles">Categories</div>
+
+        <a href="{{url_for('views.vault', category='All Passwords')}}">
+          <div class="sidebar-text {%if category == 'All Passwords'%}active{% endif %}">
+            <i class="fa-regular fa-lock-keyhole"></i>
+            <span>All Passwords</span>
+          </div>
+        </a>
+
+        <a href="{{url_for('views.vault', category='Personal')}}">
+          <div class="sidebar-text {%if category == 'Personal'%}active{% endif %}">
+            <i class="ri-user-line"></i>
+            <span>Personal</span>
+          </div>
+        </a>
+
+        <a href="{{url_for('views.vault', category='Work')}}">
+          <div class="sidebar-text {%if category == 'Work'%}active{% endif %}">
+            <i class="fa-regular fa-briefcase"></i>
+            <span>Work</span>
+          </div>
+        </a>
+
+        <a href="{{url_for('views.vault', category='Finance')}}">
+          <div class="sidebar-text {%if category == 'Finance'%}active{% endif %}">
+            <i class="fa-regular fa-wallet"></i>
+            <span>Finance</span>
+          </div>
+        </a>
+
+        <a href="{{url_for('views.vault', category='Gaming')}}">
+          <div class="sidebar-text {%if category == 'Gaming'%}active{% endif %}">
+            <i class="fa-regular fa-gamepad-modern"></i>
+            <span>Gaming</span>
+          </div>
+        </a>
+
+        <div class="sidebar-text">
+          <i class="fa-solid fa-plus"></i>
+          <span>Add Category</span>
+        </div>
+
+        <!-- Invisible divider between Categories and Quick Actions -->
+        <hr class="invisible-divider" />
+
+        <div class="sidebar_titles">Quick Actions</div>
+
+        <div class="sidebar-text">
+          <i class="fa-regular fa-key"></i>
+          <span>Password Generator</span>
+        </div>
+
+        <div class="sidebar-text">
+          <i class="fa-regular fa-circle-plus"></i>
+          <span>Add New Entry</span>
+        </div>
+
+        <div class="sidebar-text">
+          <i class="fa-regular fa-shield-check"></i>
+          <span>Security Check</span>
+        </div>
+
+        <div class="sidebar-text">
+          <i class="ri-refresh-line"></i>
+          <span>Sync Now</span>
+        </div>
+      </div>
+
+      <!-- Bottom Divider -->
+      <hr class="bottom-divider" />
+
+      <!-- Auto-logout section -->
+      <div class="logout-box">
+        <div class="logout-header">
+          <span>Auto-logout in</span>
+          <span class="time">14:32</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      {% if category == 'All Passwords' %}
+      <h2>All Passwords</h2>
+      {% elif category == 'Personal' %}
+      <h2>Personal Passwords</h2>
+      {% elif category == 'Work' %}
+      <h2>Work Passwords</h2>
+      {% elif category == 'Finance' %}
+      <h2>Finance Passwords</h2>
+      {% elif category == 'Gaming' %}
+      <h2>Gaming Passwords</h2>
+      {% else %}
+      <h2>Unknown Category</h2>
+      {% endif %}
+      <p>Content for {{ category }} category will go here.</p>
+    </div>
+  </body>
+</html>
+
+
+  

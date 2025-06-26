@@ -1,10 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Password Manager</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webi - Secure Password Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
 </head>
 <body>
-    <div><h1>Home page for my Website</h1></div>
+    <!-- Master Password Login Modal -->
+    <div id="masterPasswordModal" class="modal-container">
+        <div class="modal-content">
+            <div class="logo-container">
+                <h1 class="logo-page1">webi</h1>
+            </div>
+            <h2 class="modal-title">Enter Master Password</h2>
+            <p class="modal-description">
+                Please enter your master password to access your<br>
+                secure vault
+            </p>
+            
+            <div class="password-input-container">
+                <input type="password" id="masterPassword" class="password-input" placeholder="Master Password">
+                <input type="checkbox" id="password-toggle-checkbox" class="hidden-checkbox">
+                <label for="password-toggle-checkbox" class="password-toggle">
+                    <i class="ri-eye-line"></i>
+                    <i class="ri-eye-off-line"></i>
+                </label>
+            </div>
+            
+            <div class="remember-device">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="rememberDevice">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Remember this device for 30 days</span>
+                </label>
+            </div>
+            
+            <form action="{{ url_for('views.vault') }}" method="get">
+                <button type="submit" id="loginButton" class="unlock-button">Unlock Vault</button>
+            </form>
+
+            <div class="forgot-password">
+                <a href="#" class="forgot-link">Forgot Master Password?</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
