@@ -9,4 +9,5 @@ def index():
 @views.route('/vault')
 def vault():
     category = request.args.get('category', 'all')
-    return render_template('vault.html', category=category)
+    show_popup = request.args.get('popup') == 'password-generator'
+    return render_template('vault.html', category=category, show_popup=show_popup)

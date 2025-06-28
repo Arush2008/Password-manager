@@ -94,10 +94,12 @@
 
         <div class="sidebar_titles">Quick Actions</div>
 
-        <div class="sidebar-text">
-          <i class="fa-regular fa-key"></i>
-          <span>Password Generator</span>
-        </div>
+        <a href="{{ url_for('views.vault', category=category, popup='password-generator') }}">
+          <div class="sidebar-text" id="password-generator-btn">
+            <i class="fa-regular fa-key"></i>
+            <span>Password Generator</span>
+          </div>
+        </a>
 
         <div class="sidebar-text">
           <i class="fa-regular fa-circle-plus"></i>
@@ -147,8 +149,30 @@
       {% endif %}
       <p>Content for {{ category }} category will go here.</p>
     </div>
+
+    <!-- Password Generator Popup -->
+    {% if show_popup %}
+    <div class="popup-overlay">
+      <div class="popup-content">
+        <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
+        <h2>Password Generator</h2>
+
+        
+        <!-- Generated Password Display Section -->
+        <div class="password-display-section">
+          <label for="generated-password">Generated Password:</label>
+          <div class="password-output-container">
+            <input type="text" id="generated-password" class="password-output" value="TempPassword123!" readonly>
+            <form method="post" style="display: inline;">
+              <input type="hidden" name="copy_password" value="TempPassword123!">
+              <button type="submit" class="copy-btn" title="Select password to copy">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </form>
+          </div>
+      </div>
+    </div>
+    {% endif %}
   </body>
 </html>
 
-
-  
