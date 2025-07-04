@@ -157,22 +157,106 @@
         <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
         <h2>Password Generator</h2>
 
-        
         <!-- Generated Password Display Section -->
         <div class="password-display-section">
           <label for="generated-password">Generated Password:</label>
           <div class="password-output-container">
-            <input type="text" id="generated-password" class="password-output" value="TempPassword123!" readonly>
-            <form method="post" style="display: inline;">
-              <input type="hidden" name="copy_password" value="TempPassword123!">
-              <button type="submit" class="copy-btn" title="Select password to copy">
-                <i class="fa-regular fa-copy"></i>
-              </button>
-            </form>
+            <div class="password-output">
+              <input type="text" id="generated-password" class="password-output-input" value="{{ generated_password }}" readonly>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length) }}" class="refresh-btn" title="Generate new password">
+                <i class="ri-refresh-line"></i>
+              </a>
+            </div>
+            <button type="button" class="copy-btn" title="Click to select password for copying" onclick="document.getElementById('generated-password').select()">
+              <i class="fa-regular fa-copy"></i>
+            </button>
           </div>
+          
+          <!-- Password Length Controls -->
+          <div class="password-length-section">
+            <label for="password-length">Password Length: {{ password_length }}</label>
+            <div class="length-controls">
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length-1) }}" 
+                 class="length-btn {% if password_length <= 8 %}disabled{% endif %}">-</a>
+              <span class="length-display">{{ password_length }}</span>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length+1) }}" 
+                 class="length-btn {% if password_length >= 32 %}disabled{% endif %}">+</a>
+            </div>
+            
+            <!-- Functional slider with clickable points -->
+            <div class="slider-visual">
+              <div class="slider-track">
+                <div class="slider-fill" data-width="{{ ((password_length - 8) / 24 * 100) | round(1) }}"></div>
+                <div class="slider-thumb" data-left="{{ ((password_length - 8) / 24 * 100) | round(1) }}"></div>
+                <!-- Clickable points along the slider -->
+                {% for i in range(8, 33, 2) %}
+                <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=i) }}" 
+                   class="slider-point" 
+                   data-left="{{ ((i - 8) / 24 * 100) | round(1) }}"
+                   title="Length {{ i }}"></a>
+                {% endfor %}
+              </div>
+            </div>
+            
+            <!-- Password Options -->
+            <div class="password-options">
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length, uppercase=not include_uppercase, lowercase=include_lowercase, numbers=include_numbers, symbols=include_symbols) }}" class="password-option {% if include_uppercase %}active{% endif %}">
+                <span class="checkmark"></span>
+                <span>Uppercase (A-Z)</span>
+              </a>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length, uppercase=include_uppercase, lowercase=not include_lowercase, numbers=include_numbers, symbols=include_symbols) }}" class="password-option {% if include_lowercase %}active{% endif %}">
+                <span class="checkmark"></span>
+                <span>Lowercase (a-z)</span>
+              </a>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length, uppercase=include_uppercase, lowercase=include_lowercase, numbers=not include_numbers, symbols=include_symbols) }}" class="password-option {% if include_numbers %}active{% endif %}">
+                <span class="checkmark"></span>
+                <span>Numbers (0-9)</span>
+              </a>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length, uppercase=include_uppercase, lowercase=include_lowercase, numbers=include_numbers, symbols=not include_symbols) }}" class="password-option {% if include_symbols %}active{% endif %}">
+                <span class="checkmark"></span>
+                <span>Symbols (!@#$)</span>
+              </a>
+            </div>
+
+            
+            <!-- Quick length buttons -->
+            <div class="quick-lengths">
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=8) }}" 
+                 class="quick-btn {% if password_length == 8 %}active{% endif %}">8</a>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=12) }}" 
+                 class="quick-btn {% if password_length == 12 %}active{% endif %}">12</a>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=16) }}" 
+                 class="quick-btn {% if password_length == 16 %}active{% endif %}">16</a>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=24) }}" 
+                 class="quick-btn {% if password_length == 24 %}active{% endif %}">24</a>
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=32) }}" 
+                 class="quick-btn {% if password_length == 32 %}active{% endif %}">32</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     {% endif %}
   </body>
+  
+  <script>
+    // Set slider positions from data attributes (no user interaction)
+    document.addEventListener('DOMContentLoaded', function() {
+      const fill = document.querySelector('.slider-fill[data-width]');
+      const thumb = document.querySelector('.slider-thumb[data-left]');
+      const points = document.querySelectorAll('.slider-point[data-left]');
+      
+      if (fill) {
+        fill.style.width = fill.getAttribute('data-width') + '%';
+      }
+      
+      if (thumb) {
+        thumb.style.left = thumb.getAttribute('data-left') + '%';
+      }
+      
+      points.forEach(point => {
+        point.style.left = point.getAttribute('data-left') + '%';
+      });
+    });
+  </script>
 </html>
-
