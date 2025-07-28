@@ -53,12 +53,12 @@ def vault():
         )
     
     return render_template('vault.html', 
-                         category=category, 
-                         show_popup=show_popup,
-                         password_length=password_length,
-                         generated_password=generated_password,
-                         include_uppercase=include_uppercase,
-                         include_lowercase=include_lowercase,
-                         include_numbers=include_numbers,
-                         include_symbols=include_symbols)
+        category=category, 
+        show_popup=show_popup,
+        password_length=password_length,
+        generated_password=generated_password,
+        include_uppercase=include_uppercase,
+        include_lowercase=include_lowercase,
+        include_numbers=include_numbers,
+        include_symbols=include_symbols)
 

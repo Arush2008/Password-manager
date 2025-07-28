@@ -178,24 +178,9 @@
             <div class="length-controls">
               <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length-1) }}" 
                  class="length-btn {% if password_length <= 8 %}disabled{% endif %}">-</a>
-              <span class="length-display">{{ password_length }}</span>
+              <input type="range" min="8" max="32" value="12" class="slider" id="myRange">
               <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length+1) }}" 
                  class="length-btn {% if password_length >= 32 %}disabled{% endif %}">+</a>
-            </div>
-            
-            <!-- Functional slider with clickable points -->
-            <div class="slider-visual">
-              <div class="slider-track">
-                <div class="slider-fill" data-width="{{ ((password_length - 8) / 24 * 100) | round(1) }}"></div>
-                <div class="slider-thumb" data-left="{{ ((password_length - 8) / 24 * 100) | round(1) }}"></div>
-                <!-- Clickable points along the slider -->
-                {% for i in range(8, 33, 2) %}
-                <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=i) }}" 
-                   class="slider-point" 
-                   data-left="{{ ((i - 8) / 24 * 100) | round(1) }}"
-                   title="Length {{ i }}"></a>
-                {% endfor %}
-              </div>
             </div>
           </div>
         </div>
