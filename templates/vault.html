@@ -21,6 +21,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
     />
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
   </head>
   <body class="vault_page">
     <!-- Top Bar -->
@@ -174,11 +175,11 @@
           
           <!-- Password Length Controls -->
           <div class="password-length-section">
-            <label for="password-length">Password Length: {{ password_length }}</label>
+            <label for="password-length">Password Length: <span id="length-display">{{ password_length }}</span></label>
             <div class="length-controls">
               <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length-1) }}" 
                  class="length-btn {% if password_length <= 8 %}disabled{% endif %}">-</a>
-              <input type="range" min="8" max="32" value="12" class="slider" id="myRange">
+              <input type="range" min="8" max="32" value="{{ password_length }}" class="slider" id="myRange">
               <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length+1) }}" 
                  class="length-btn {% if password_length >= 32 %}disabled{% endif %}">+</a>
             </div>

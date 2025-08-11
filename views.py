@@ -31,7 +31,7 @@ def vault():
     category = request.args.get('category', 'All Passwords')
     show_popup = request.args.get('popup') == 'password-generator'
     
-    # Handle password length
+    # Handle password length - check for slider value first, then URL parameter
     password_length = int(request.args.get('length', 12))
     password_length = max(8, min(32, password_length))  # Ensure within bounds
     
@@ -61,4 +61,26 @@ def vault():
         include_lowercase=include_lowercase,
         include_numbers=include_numbers,
         include_symbols=include_symbols)
+
+@views.route('/generate-password')
+def generate_password_ajax():
+    """AJAX endpoint to generate password with slider value"""
+    length = int(request.args.get('length', 12))
+    length = max(8, min(32, length))  # Ensure within bounds
+    
+    # Handle password options
+    include_uppercase = request.args.get('uppercase', 'true') == 'true'
+    include_lowercase = request.args.get('lowercase', 'true') == 'true'
+    include_numbers = request.args.get('numbers', 'true') == 'true'
+    include_symbols = request.args.get('symbols', 'true') == 'true'
+    
+    password = generate_password(
+        length=length,
+        include_uppercase=include_uppercase,
+        include_lowercase=include_lowercase,
+        include_numbers=include_numbers,
+        include_symbols=include_symbols
+    )
+    
+    return {'password': password, 'length': length}
 
