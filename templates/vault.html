@@ -24,6 +24,7 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
   </head>
   <body class="vault_page">
+    
     <!-- Top Bar -->
     <div class="top_part">
       <div class="top-left">
@@ -46,7 +47,6 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-      <!-- Top Content of Sidebar -->
       <div class="sidebar-content">
         <div class="sidebar_titles">Categories</div>
 
@@ -93,6 +93,8 @@
         <!-- Invisible divider between Categories and Quick Actions -->
         <hr class="invisible-divider" />
 
+
+        <!-- Quick Actions Section -->
         <div class="sidebar_titles">Quick Actions</div>
 
         <a href="{{ url_for('views.vault', category=category, popup='password-generator') }}">
