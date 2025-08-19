@@ -1,3 +1,4 @@
+// for live length change
 document.addEventListener('DOMContentLoaded', function() {
     const slider = document.getElementById('myRange');
     const lengthDisplay = document.getElementById('length-display');
