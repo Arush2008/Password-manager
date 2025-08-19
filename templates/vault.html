@@ -185,6 +185,15 @@
               <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length+1) }}" 
                  class="length-btn {% if password_length >= 32 %}disabled{% endif %}">+</a>
             </div>
+
+          <!-- Password Options  -->
+          <div class="password-options-section">
+            <div class="options">
+              <label><input type="checkbox" {% if include_uppercase %}checked{% endif %}> Uppercase Letters <span class="option-example">(A-Z)</span></label>
+              <label><input type="checkbox" {% if include_lowercase %}checked{% endif %}> Lowercase Letters <span class="option-example">(a-z)</span></label>
+              <label><input type="checkbox" {% if include_numbers %}checked{% endif %}> Numbers <span class="option-example">(0-9)</span></label>
+              <label><input type="checkbox" {% if include_symbols %}checked{% endif %}> Special Characters <span class="option-example">(!@#$%^&*)</span></label>
+            </div>
           </div>
         </div>
       </div>
