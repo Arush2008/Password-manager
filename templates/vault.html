@@ -104,10 +104,12 @@
           </div>
         </a>
 
-        <div class="sidebar-text">
-          <i class="fa-regular fa-circle-plus"></i>
-          <span>Add New Entry</span>
-        </div>
+        <a href="{{ url_for('views.vault', category=category, popup='add-new-entry') }}">
+          <div class="sidebar-text">
+            <i class="fa-regular fa-circle-plus"></i>
+            <span>Add New Entry</span>
+          </div>
+        </a>
 
         <div class="sidebar-text">
           <i class="fa-regular fa-shield-check"></i>
@@ -153,8 +155,8 @@
       <p>Content for {{ category }} category will go here.</p>
     </div>
 
-    <!-- Password Generator Popup -->
-    {% if show_popup %}
+    <!------------------------------------- Password Generator Popup ------------------------------------->
+    {% if show_password_generator_popup %}
     <div class="popup-overlay">
       <div class="popup-content">
         <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
@@ -198,5 +200,17 @@
       </div>
     </div>
     {% endif %}
+
+    <!------------------------------------- Add New Entry Popup ------------------------------------->
+    {% if show_new_entry_popup %}
+    <div class="popup-overlay">
+      <div class="popup-content">
+        <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
+        <h2>Add New Entry</h2>
+      </div>
+    </div>
+    {% endif %}
+
+
   </body>
 </html>
