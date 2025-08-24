@@ -477,14 +477,6 @@ body.vault_page {
   overflow-y: auto;
 }
 
-.popup-content h2 {
-  font-size: 1.8em;
-  margin: 0 0 25px 0;
-  color: #333;
-  text-align: center;
-  font-weight: 600;
-}
-
 .close-btn {
   position: absolute;
   top: 15px;
@@ -503,7 +495,7 @@ body.vault_page {
 
 /* Password Display Section */
 .password-display-section {
-  margin-bottom: 25px;
+  margin-top: 20px;
 }
 
 .password-display-section label {
@@ -557,21 +549,24 @@ body.vault_page {
   border-radius: 4px;
   transition: all 0.2s ease;
   text-decoration: none;
+  margin-right: 10px;
 }
 
 .refresh-btn:hover {
   background-color: #e0e0e0;
   color: #8e6ff7;
+  padding: 8px 10px;
+  border-radius: 8px;
 }
 
 .copy-btn {
-  padding: 12px 15px;
+  padding: 10px 12px;
   background-color: #8e6ff7;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   transition: background-color 0.2s ease;
   display: flex;
   align-items: center;
@@ -580,10 +575,6 @@ body.vault_page {
 
 .copy-btn:hover {
   background-color: #7d5df1;
-}
-
-.copy-btn i {
-  font-size: 18px;
 }
 
 /* Password Length Controls */
@@ -706,4 +697,45 @@ body.vault_page {
   font-size: 14px; /* still a bit bigger */
   opacity: 0.8;
   margin-left: 10px;
+}
+
+
+
+/* -------------------------------------------------- New Entry Popup Styles -------------------------------------------------- */
+
+.popup-2-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-2-content {
+  background-color: white;
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  min-width: 320px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.popup-2-content h2 {
+  font-size: 1.4em;
+  margin: 0px 0 25px 0;
+  top: 15px;
+  padding-top: -15px;
+  color: #333;
+  text-align: left;
+  justify-content: center;
 }

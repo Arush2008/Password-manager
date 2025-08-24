@@ -93,7 +93,6 @@
         <!-- Invisible divider between Categories and Quick Actions -->
         <hr class="invisible-divider" />
 
-
         <!-- Quick Actions Section -->
         <div class="sidebar_titles">Quick Actions</div>
 
@@ -140,17 +139,17 @@
     <!-- Main Content -->
     <div class="main-content">
       {% if category == 'All Passwords' %}
-      <h2>All Passwords</h2>
+        <h2>All Passwords</h2>
       {% elif category == 'Personal' %}
-      <h2>Personal Passwords</h2>
+        <h2>Personal Passwords</h2>
       {% elif category == 'Work' %}
-      <h2>Work Passwords</h2>
+        <h2>Work Passwords</h2>
       {% elif category == 'Finance' %}
-      <h2>Finance Passwords</h2>
+        <h2>Finance Passwords</h2>
       {% elif category == 'Gaming' %}
-      <h2>Gaming Passwords</h2>
+        <h2>Gaming Passwords</h2>
       {% else %}
-      <h2>Unknown Category</h2>
+        <h2>Unknown Category</h2>
       {% endif %}
       <p>Content for {{ category }} category will go here.</p>
     </div>
@@ -160,7 +159,6 @@
     <div class="popup-overlay">
       <div class="popup-content">
         <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
-        <h2>Password Generator</h2>
 
         <!-- Generated Password Display Section -->
         <div class="password-display-section">
@@ -168,13 +166,13 @@
           <div class="password-output-container">
             <div class="password-output">
               <input type="text" id="generated-password" class="password-output-input" value="{{ generated_password }}" readonly>
-              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length) }}" class="refresh-btn" title="Generate new password">
+              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length-1) }}" class="refresh-btn" title="Generate new password">
                 <i class="ri-refresh-line"></i>
               </a>
+              <button type="button" class="copy-btn" title="Copy Password" onclick="navigator.clipboard.writeText(document.getElementById('generated-password').value)">
+                <i class="fa-regular fa-copy"></i>
+              </button>
             </div>
-            <button type="button" class="copy-btn" title="Click to select password for copying" onclick="document.getElementById('generated-password').select()">
-              <i class="fa-regular fa-copy"></i>
-            </button>
           </div>
           
           <!-- Password Length Controls -->
@@ -188,12 +186,14 @@
                  class="length-btn {% if password_length >= 32 %}disabled{% endif %}">+</a>
             </div>
 
-          <div class="password-options-section">
-            <div class="options">
-              <label><input type="checkbox" {% if include_uppercase %}checked{% endif %}> Uppercase Letters <span class="option-example">(A-Z)</span></label>
-              <label><input type="checkbox" {% if include_lowercase %}checked{% endif %}> Lowercase Letters <span class="option-example">(a-z)</span></label>
-              <label><input type="checkbox" {% if include_numbers %}checked{% endif %}> Numbers <span class="option-example">(0-9)</span></label>
-              <label><input type="checkbox" {% if include_symbols %}checked{% endif %}> Special Characters <span class="option-example">(!@#$%^&*)</span></label>
+            <!-- Password Options -->
+            <div class="password-options-section">
+              <div class="options">
+                <label><input type="checkbox" name="include_uppercase" {% if include_uppercase %}checked{% endif %}> Uppercase Letters <span class="option-example">(A-Z)</span></label>
+                <label><input type="checkbox" name="include_lowercase" {% if include_lowercase %}checked{% endif %}> Lowercase Letters <span class="option-example">(a-z)</span></label>
+                <label><input type="checkbox" name="include_numbers" {% if include_numbers %}checked{% endif %}> Numbers <span class="option-example">(0-9)</span></label>
+                <label><input type="checkbox" name="include_symbols" {% if include_symbols %}checked{% endif %}> Special Characters <span class="option-example">(!@#$%^&*)</span></label>
+              </div>
             </div>
           </div>
         </div>
@@ -203,14 +203,43 @@
 
     <!------------------------------------- Add New Entry Popup ------------------------------------->
     {% if show_new_entry_popup %}
-    <div class="popup-overlay">
-      <div class="popup-content">
-        <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
+    <div class="popup-2-overlay">
+      <div class="popup-2-content">
         <h2>Add New Entry</h2>
+        <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
+        <div>
+          <form>
+            <label for="entry-website-app">Website/App</label><br>
+            <input type="text" id="entry-website-app" name="entry-website-app" required><br>
+
+            <label for="entry-username-email">Username/Email</label><br>
+            <input type="text" id="entry-username-email" name="entry-username-email" required><br>
+
+            <label for="entry-password">Password</label><br>
+            <input type="password" id="entry-password" name="entry-password" required><br>
+
+            <label for="category-select">Category</label><br>
+            <select id="category-select" name="category-select">
+              <option value="Personal" {% if category == 'Personal' %}selected{% endif %}>Personal</option>
+              <option value="Work" {% if category == 'Work' %}selected{% endif %}>Work</option>
+              <option value="Finance" {% if category == 'Finance' %}selected{% endif %}>Finance</option>
+              <option value="Gaming" {% if category == 'Gaming' %}selected{% endif %}>Gaming</option>
+            </select><br>
+
+            <label for="entry-notes">Notes (optional)</label><br>
+            <textarea id="entry-notes" name="entry-notes"></textarea><br>
+
+            <label><input type="checkbox" id="auto-fill-btn" name="auto-fill-btn"> Auto-fill on websites/apps</label>
+            <label><input type="checkbox" id="favorite-btn" name="favorite-btn"> Favorite</label><br>
+
+            <input type="submit" id="save-password-btn" name="save-password-btn" value="Save Password">
+            <a href="{{ url_for('views.vault', category=category) }}" class="cancel-btn">Cancel</a>
+          </form>
+        </div>
       </div>
     </div>
     {% endif %}
 
-
   </body>
 </html>
+
