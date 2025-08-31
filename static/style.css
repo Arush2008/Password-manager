@@ -448,6 +448,75 @@ body.vault_page {
   padding: 20px;
 }
 
+/* Password List Styling */
+.password-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.password-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.password-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.password-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 8px;
+}
+
+.password-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.password-category {
+  background: #8e6ff7;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.password-details {
+  margin-top: 12px;
+}
+
+.password-details p {
+  margin: 8px 0;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.password-details strong {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.password-details a {
+  color: #8e6ff7;
+  text-decoration: none;
+}
+
+.password-details a:hover {
+  text-decoration: underline;
+}
+
 /* -------------------------------------------------- Password Generator Popup Styles -------------------------------------------------- */
 
 .popup-overlay {
@@ -475,6 +544,7 @@ body.vault_page {
   box-sizing: border-box;
   max-height: 90vh;
   overflow-y: auto;
+  animation: popup-appear 0.25s ease-out;
 }
 
 .close-btn {
@@ -646,9 +716,9 @@ body.vault_page {
 
 /* options for password generator */
 .password-options-section label {
-  font-weight: 500; /* lighter than before */
+  font-weight: 500;
   color: #292929;
-  font-size: 16px; /* still bigger */
+  font-size: 16px; 
   padding: 15px;
   border-radius: 15px;
   border: 2px solid #ddd;
@@ -693,8 +763,8 @@ body.vault_page {
 
 .option-example {
   color: #626262;
-  font-weight: 400; /* lighter */
-  font-size: 14px; /* still a bit bigger */
+  font-weight: 400;
+  font-size: 14px;
   opacity: 0.8;
   margin-left: 10px;
 }
@@ -703,18 +773,7 @@ body.vault_page {
 
 /* -------------------------------------------------- New Entry Popup Styles -------------------------------------------------- */
 
-.popup-2-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+
 
 .popup-2-content {
   background-color: white;
@@ -730,12 +789,91 @@ body.vault_page {
   overflow-y: auto;
 }
 
-.popup-2-content h2 {
-  font-size: 1.4em;
-  margin: 0px 0 25px 0;
-  top: 15px;
-  padding-top: -15px;
-  color: #333;
-  text-align: left;
+.popup-2-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-2-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 32px;
+  width: 90%;
+  max-width: 460px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  animation: popup-appear 0.25s ease-out;
+}
+
+.popup-2-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #222;
+  font-weight: 600;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 10px;
+}
+
+.text-label {
+  display: block;
+  margin: 12px 0 6px 0;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+#save-password-btn {
+  background: #8e6ff7;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 10px;
+}
+
+#save-password-btn:hover {
+  background: #7658d8;
+}
+
+.cancel-btn {
+  margin-left: 12px;
+  color: #555;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 15px 25px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #f9fafb;
+}
+
+@keyframes popup-appear {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }

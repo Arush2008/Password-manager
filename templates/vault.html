@@ -151,7 +151,32 @@
       {% else %}
         <h2>Unknown Category</h2>
       {% endif %}
-      <p>Content for {{ category }} category will go here.</p>
+      
+      <!-- Display saved passwords -->
+      {% if passwords %}
+        <div class="password-list">
+          {% for password in passwords %}
+            <div class="password-card">
+              <div class="password-header">
+                <h3>{{ password.title }}</h3>
+                <span class="password-category">{{ password.category }}</span>
+              </div>
+              <div class="password-details">
+                <p><strong>Username:</strong> {{ password.username }}</p>
+                <p><strong>Password:</strong> ••••••••</p>
+                {% if password.url %}
+                  <p><strong>URL:</strong> <a href="{{ password.url }}" target="_blank">{{ password.url }}</a></p>
+                {% endif %}
+                {% if password.notes %}
+                  <p><strong>Notes:</strong> {{ password.notes }}</p>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No passwords saved in this category yet. <a href="{{ url_for('views.vault', category=category, popup='add-new-entry') }}">Add your first password entry!</a></p>
+      {% endif %}
     </div>
 
     <!------------------------------------- Password Generator Popup ------------------------------------->
@@ -208,26 +233,29 @@
         <h2>Add New Entry</h2>
         <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
         <div>
-          <form>
-            <label for="entry-website-app">Website/App</label><br>
-            <input type="text" id="entry-website-app" name="entry-website-app" required><br>
+          <form method="POST" action="{{ url_for('views.vault') }}">
+            <label for="title" class="text-label">Website/App</label><br>
+            <input type="text" id="title" name="title" class="text-input" required><br>
 
-            <label for="entry-username-email">Username/Email</label><br>
-            <input type="text" id="entry-username-email" name="entry-username-email" required><br>
+            <label for="username" class="text-label">Username/Email</label><br>
+            <input type="text" id="username" name="username" class="text-input" required><br>
 
-            <label for="entry-password">Password</label><br>
-            <input type="password" id="entry-password" name="entry-password" required><br>
+            <label for="password" class="text-label">Password</label><br>
+            <input type="password" id="password" name="password" class="text-input" required><br>
 
-            <label for="category-select">Category</label><br>
-            <select id="category-select" name="category-select">
+            <label for="url" class="text-label">Website URL (optional)</label><br>
+            <input type="url" id="url" name="url" class="text-input" placeholder="https://example.com"><br>
+
+            <label for="category" class="text-label">Category</label><br>
+            <select id="category" name="category" class="text-input">
               <option value="Personal" {% if category == 'Personal' %}selected{% endif %}>Personal</option>
               <option value="Work" {% if category == 'Work' %}selected{% endif %}>Work</option>
               <option value="Finance" {% if category == 'Finance' %}selected{% endif %}>Finance</option>
               <option value="Gaming" {% if category == 'Gaming' %}selected{% endif %}>Gaming</option>
             </select><br>
 
-            <label for="entry-notes">Notes (optional)</label><br>
-            <textarea id="entry-notes" name="entry-notes"></textarea><br>
+            <label for="notes" class="text-label">Notes (optional)</label><br>
+            <textarea id="notes" name="notes" class="text-input"></textarea><br>
 
             <label><input type="checkbox" id="auto-fill-btn" name="auto-fill-btn"> Auto-fill on websites/apps</label>
             <label><input type="checkbox" id="favorite-btn" name="favorite-btn"> Favorite</label><br>
