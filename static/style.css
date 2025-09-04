@@ -441,14 +441,16 @@ body.vault_page {
   padding-bottom: 20px;
 }
 
-/* Main Content */
+
+
+/* -------------------------------------------------- password area Styles -------------------------------------------------- */
+
 .main-content {
   margin-left: 255px;
   margin-top: 63px;
   padding: 20px;
 }
 
-/* Password List Styling */
 .password-list {
   display: grid;
   gap: 16px;
