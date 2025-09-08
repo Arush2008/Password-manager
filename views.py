@@ -34,6 +34,7 @@ def vault():
     show_new_entry_popup = request.args.get('popup') == 'add-new-entry'
     show_edit_entry_popup = request.args.get('popup') == 'edit-entry'
     edit_password_id = request.args.get('id')
+    show_password = request.args.get('show_password') == 'true'
 
     edit_password_data = None
     if show_edit_entry_popup and edit_password_id:
@@ -97,6 +98,7 @@ def vault():
         show_edit_entry_popup=show_edit_entry_popup,
         edit_password_data=edit_password_data,
         edit_password_id=edit_password_id,
+        show_password=show_password,
         password_length=password_length,
         generated_password=generated_password,
         include_uppercase=include_uppercase,

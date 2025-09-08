@@ -19,3 +19,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// for show/hide password
+ function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('toggle-icon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.className = 'ri-eye-off-line';
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.className = 'ri-eye-line';
+      }
+    }

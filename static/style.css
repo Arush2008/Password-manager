@@ -879,3 +879,35 @@ body.vault_page {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+/* Password field container */
+.password-field-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.password-toggle-link {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  background: none;
+  border: none;
+  font-size: 18px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.password-toggle-link:hover {
+  color: #8e6ff7;
+}
+
+/* Adjust text input when it has a toggle link */
+.password-field-container .text-input {
+  padding-right: 45px;
+}
