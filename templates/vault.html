@@ -41,7 +41,7 @@
         <button class="icon-button settings">
           <i class="fa-regular fa-gear"></i>
         </button>
-        <div class="profile-avatar">A</div>
+        <div class="profile-avatar"><i class="fa-regular fa-user"></i></div>
       </div>
     </div>
 
@@ -120,20 +120,6 @@
           <span>Sync Now</span>
         </div>
       </div>
-
-      <!-- Bottom Divider -->
-      <hr class="bottom-divider" />
-
-      <!-- Auto-logout section -->
-      <div class="logout-box">
-        <div class="logout-header">
-          <span>Auto-logout in</span>
-          <span class="time">14:32</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-        </div>
-      </div>
     </div>
 
     <!-- Main Content -->
@@ -195,9 +181,9 @@
           <div class="password-output-container">
             <div class="password-output">
               <input type="text" id="generated-password" class="password-output-input" value="{{ generated_password }}" readonly>
-              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length-1) }}" class="refresh-btn" title="Generate new password">
+              <button type="button" class="refresh-btn" title="Generate new password" onclick="generateNewPassword()">
                 <i class="ri-refresh-line"></i>
-              </a>
+              </button>
               <button type="button" class="copy-btn" title="Copy Password" onclick="navigator.clipboard.writeText(document.getElementById('generated-password').value)">
                 <i class="fa-regular fa-copy"></i>
               </button>
@@ -208,20 +194,18 @@
           <div class="password-length-section">
             <label for="password-length">Password Length: <span id="length-display">{{ password_length }}</span></label>
             <div class="length-controls">
-              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length-1) }}" 
-                 class="length-btn {% if password_length <= 8 %}disabled{% endif %}">-</a>
+              <a href="#" class="length-btn {% if password_length <= 8 %}disabled{% endif %}" onclick="decreaseLength(event)">-</a>
               <input type="range" min="8" max="32" value="{{ password_length }}" class="slider" id="myRange">
-              <a href="{{ url_for('views.vault', category=category, popup='password-generator', length=password_length+1) }}" 
-                 class="length-btn {% if password_length >= 32 %}disabled{% endif %}">+</a>
+              <a href="#" class="length-btn {% if password_length >= 32 %}disabled{% endif %}" onclick="increaseLength(event)">+</a>
             </div>
 
             <!-- Password Options -->
             <div class="password-options-section">
               <div class="options">
-                <label><input type="checkbox" name="include_uppercase" {% if include_uppercase %}checked{% endif %}> Uppercase Letters <span class="option-example">(A-Z)</span></label>
-                <label><input type="checkbox" name="include_lowercase" {% if include_lowercase %}checked{% endif %}> Lowercase Letters <span class="option-example">(a-z)</span></label>
-                <label><input type="checkbox" name="include_numbers" {% if include_numbers %}checked{% endif %}> Numbers <span class="option-example">(0-9)</span></label>
-                <label><input type="checkbox" name="include_symbols" {% if include_symbols %}checked{% endif %}> Special Characters <span class="option-example">(!@#$%^&*)</span></label>
+                <label><input type="checkbox" name="uppercase" checked> Uppercase Letters <span class="option-example">(A-Z)</span></label>
+                <label><input type="checkbox" name="lowercase" checked> Lowercase Letters <span class="option-example">(a-z)</span></label>
+                <label><input type="checkbox" name="numbers" checked> Numbers <span class="option-example">(0-9)</span></label>
+                <label><input type="checkbox" name="symbols" checked> Special Characters <span class="option-example">(!@#$%^&*)</span></label>
               </div>
             </div>
           </div>

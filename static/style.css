@@ -400,41 +400,6 @@ body.vault_page {
   margin: 0;
 }
 
-.logout-box {
-  padding-top: 14px;
-  position: sticky;
-  bottom: 0;
-  background-color: white;
-  z-index: 1;
-}
-
-.logout-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #505661;
-  margin-bottom: 8px;
-}
-
-.logout-header .time {
-  color: rgb(31, 46, 62);
-  font-weight: 500;
-  font-size: 12px;
-}
-
-.progress-bar {
-  height: 4px;
-  background-color: #e5e7eb;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  width: 70%;
-  background-color: #8e6ff7;
-}
-
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
@@ -878,36 +843,4 @@ body.vault_page {
 @keyframes popup-appear {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
-}
-
-/* Password field container */
-.password-field-container {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-}
-
-.password-toggle-link {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666;
-  background: none;
-  border: none;
-  font-size: 18px;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.password-toggle-link:hover {
-  color: #8e6ff7;
-}
-
-/* Adjust text input when it has a toggle link */
-.password-field-container .text-input {
-  padding-right: 45px;
 }
