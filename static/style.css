@@ -808,6 +808,41 @@ body.vault_page {
   box-sizing: border-box;
 }
 
+/* Password field container for popups */
+.password-field-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-field-container .text-input {
+  padding-right: 45px; /* Make room for the toggle button */
+}
+
+.password-toggle-link {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-link:hover {
+  color: #8e6ff7;
+}
+
+.password-toggle-link i {
+  font-size: 16px;
+}
+
 #save-password-btn {
   background: #8e6ff7;
   color: #fff;
