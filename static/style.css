@@ -4,34 +4,9 @@ body {
   background-color: #f9fafb;
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
-/* Modal Container */
-.modal-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 50;
-}
-
-.modal-content {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  padding: 24px;
-}
+/* (removed old modal styles) */
 
 /* Logo Styles */
 .logo-container {
@@ -808,14 +783,13 @@ body.vault_page {
   box-sizing: border-box;
 }
 
-/* Password field container for popups */
 .password-field-container {
   position: relative;
   width: 100%;
 }
 
 .password-field-container .text-input {
-  padding-right: 45px; /* Make room for the toggle button */
+  padding-right: 45px;
 }
 
 .password-toggle-link {
@@ -878,4 +852,110 @@ body.vault_page {
 @keyframes popup-appear {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+/* -------------------------------------------------- Signup / Login / MasterPassword Styles -------------------------------------------------- */
+
+.auth-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 6px;
+  border-radius: 12px;
+  margin: 0 0 16px;
+}
+.auth-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: 600;
+}
+.auth-tab.active {
+  background: #cac0ff;
+  color: #6b7280;
+}
+
+.auth-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+  margin: 12px 0 4px;
+}
+.auth-subtitle {
+  color: #6b7280;
+  text-align: center;
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+
+.auth-form .text-label {
+  display: block;
+  margin: 12px 0 6px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+}
+.auth-form .text-input,
+.auth-form .password-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.auth-form .password-input { padding-right: 44px; }
+.auth-form .text-input:focus,
+.auth-form .password-input:focus {
+  border-color: #8e6ff7;
+  box-shadow: 0 0 0 2px rgba(142, 111, 247, 0.2);
+}
+
+.primary-btn {
+  width: 100%;
+  background-color: #8e6ff7;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 12px;
+}
+
+.field-error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.input-error {
+  border-color: #f87171 !important;
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.15) !important;
 }

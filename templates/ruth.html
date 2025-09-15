@@ -1,9 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Webi - Authentication</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
-<body class="ruth-auth-page">
- 
+<body class="auth-page">
+	<div class="auth-card">
+		<div class="logo-container"><h1 class="logo-page1">webi</h1></div>
+
+		<!-- Tabs -->
+		<div class="auth-tabs">
+			<a class="auth-tab {{ 'active' if view=='signup' else '' }}" href="{{ url_for('views.signup') }}">Sign Up</a>
+			<a class="auth-tab {{ 'active' if view=='login' else '' }}" href="{{ url_for('views.login') }}">Log In</a>
+		</div>
+
+		<!-- Signup View page-->
+		{% if view == 'signup' %}
+		<h2 class="auth-title">Create your account</h2>
+				<form method="post" action="{{ url_for('views.signup') }}" class="auth-form">
+			<label class="text-label" for="name">Name</label>
+						<input class="text-input {% if errors and errors.signup and errors.signup.name %}input-error{% endif %}"
+									 id="name" name="name" placeholder="Your name" required
+									 value="{{ (values.name if values and values.name) or '' }}" />
+						{% if errors and errors.signup and errors.signup.name %}
+							<div class="field-error">{{ errors.signup.name }}</div>
+						{% endif %}
+
+			<label class="text-label" for="email">Email</label>
+						<input class="text-input {% if errors and errors.signup and errors.signup.email %}input-error{% endif %}"
+									 id="email" name="email" type="email" placeholder="you@example.com" required
+									 value="{{ (values.email if values and values.email) or '' }}" />
+						{% if errors and errors.signup and errors.signup.email %}
+							<div class="field-error">{{ errors.signup.email }}</div>
+						{% endif %}
+
+			<label class="text-label" for="password">Password</label>
+						<input class="text-input {% if errors and errors.signup and errors.signup.password %}input-error{% endif %}"
+									 id="password" name="password" type="password" placeholder="Create a password" required />
+						{% if errors and errors.signup and errors.signup.password %}
+							<div class="field-error">{{ errors.signup.password }}</div>
+						{% endif %}
+
+			<button class="primary-btn" type="submit">Continue</button>
+			<p class="auth-hint">Already have an account? <a href="{{ url_for('views.login') }}" class="link">Log in</a></p>
+		</form>
+		{% endif %}
+
+		<!-- Login View page-->
+		{% if view == 'login' %}
+		<h2 class="auth-title">Welcome back</h2>
+		<p class="auth-subtitle">Enter your details to continue.</p>
+				<form method="post" action="{{ url_for('views.login') }}" class="auth-form">
+			<label class="text-label" for="login_email">Email</label>
+						<input class="text-input {% if errors and errors.login and errors.login.email %}input-error{% endif %}"
+									 id="login_email" name="email" type="email" placeholder="you@example.com" required
+									 value="{{ (values.email if values and values.email) or '' }}" />
+						{% if errors and errors.login and errors.login.email %}
+							<div class="field-error">{{ errors.login.email }}</div>
+						{% endif %}
+
+			<label class="text-label" for="login_password">Password</label>
+						<input class="text-input {% if errors and errors.login and errors.login.password %}input-error{% endif %}"
+									 id="login_password" name="password" type="password" placeholder="Your password" required />
+						{% if errors and errors.login and errors.login.password %}
+							<div class="field-error">{{ errors.login.password }}</div>
+						{% endif %}
+
+			<button class="primary-btn" type="submit">Continue</button>
+			<p class="auth-hint">New to Webi? <a href="{{ url_for('views.signup') }}" class="link">Create an account</a></p>
+		</form>
+		{% endif %}
+
+		<!-- Master Password view page -->
+		{% if view == 'master' %}
+		<h2 class="auth-title">Set Your Master Password</h2>
+				<form method="post" action="{{ url_for('views.master') }}" class="auth-form">
+			<label class="text-label" for="master_password">Master Password</label>
+						<input class="text-input {% if errors and errors.master and errors.master.master_password %}input-error{% endif %}"
+									 id="master_password" name="master_password" type="password" placeholder="Create a master password" required />
+						{% if errors and errors.master and errors.master.master_password %}
+							<div class="field-error">{{ errors.master.master_password }}</div>
+						{% endif %}
+
+			<label class="text-label" for="master_password_confirm">Confirm Master Password</label>
+						<input class="text-input {% if errors and errors.master and errors.master.master_password_confirm %}input-error{% endif %}"
+									 id="master_password_confirm" name="master_password_confirm" type="password" placeholder="Confirm master password" required />
+						{% if errors and errors.master and errors.master.master_password_confirm %}
+							<div class="field-error">{{ errors.master.master_password_confirm }}</div>
+						{% endif %}
+
+			<button class="primary-btn" type="submit">Set Master Password</button>
+		</form>
+		{% endif %}
+	</div>
 </body>
 </html>
