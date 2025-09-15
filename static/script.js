@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const lengthDisplay = document.getElementById('length-display');
     const passwordInput = document.getElementById('generated-password');
 
-    // Function to check the status of checkboxes
+    // Function to check the status of checkboxes live
     function getPasswordOptions() {
         const uppercaseChecked = document.querySelector('input[name="uppercase"]')?.checked || false;
         const lowercaseChecked = document.querySelector('input[name="lowercase"]')?.checked || false;
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
     
-    // Function to generate new password 
+    // Function to generate new password live
     window.generateNewPassword = function() {
         if (!passwordInput) return;
         
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Function to change length buttons
+    // Function to change length buttons live
     function updateLengthButtons() {
         const decreaseBtn = document.querySelector('.length-controls .length-btn:first-child');
         const increaseBtn = document.querySelector('.length-controls .length-btn:last-child');
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // functions for + and - buttons
+    // functions for + and - buttons to change length live
     window.increaseLength = function(event) {
         event.preventDefault();
         if (slider && parseInt(slider.value) < 32) {
@@ -137,7 +137,7 @@ document.addEventListener('click', async (e) => {
   const btn = e.target.closest('.copy-btn');
   if (!btn) return;
 
-  const pwd = btn.getAttribute('data-password') || '';
+    const pwd = document.getElementById('generated-password').value || '';
   try {
     await navigator.clipboard.writeText(pwd);
 
@@ -145,7 +145,6 @@ document.addEventListener('click', async (e) => {
     const originalClass = 'fa-regular fa-copy';
     const successClass = 'fa-solid fa-check';
 
-    // swap to success
     icon.className = successClass;
 
     // revert after 1 second

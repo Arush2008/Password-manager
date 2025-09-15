@@ -19,35 +19,10 @@ def get_db_connection():
     """Establish and return a database connection."""
     conn = sqlite3.connect("password_manager.db")
     conn.row_factory = sqlite3.Row
-
-    # Create users table for authentication
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            master_password_hash TEXT
-        )
-        """
-    )
-    # Create passwords table for vault (add user_id)
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS passwords (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            site_name TEXT NOT NULL,
-            site_username TEXT NOT NULL,
-            site_password TEXT NOT NULL,
-            url TEXT,
-            notes TEXT,
-            category TEXT NOT NULL DEFAULT 'Personal'
-        )
-        """
-    )
     conn.commit()
 
+    # This checks to ensure newer columns exist even if
+    # the table was created by an older version of the app.
     cur = conn.execute("PRAGMA table_info(passwords)")
     cols = {row[1] for row in cur.fetchall()}
     if "category" not in cols:
@@ -69,19 +44,6 @@ def get_db_connection():
 def generate_password(length=12, include_uppercase=True,
                       include_lowercase=True, include_numbers=True,
                       include_symbols=True):
-    """
-    Generate a secure password based on specified criteria.
-
-    Args:
-        length (int): Length of the password (8-32 characters)
-        include_uppercase (bool): Include uppercase letters (A-Z)
-        include_lowercase (bool): Include lowercase letters (a-z)
-        include_numbers (bool): Include numbers (0-9)
-        include_symbols (bool): Include special characters (!@#$%^&*)
-
-    Returns:
-        str: Generated password
-    """
     length = max(8, min(32, length))
 
     characters = ""
@@ -100,6 +62,7 @@ def generate_password(length=12, include_uppercase=True,
 
     password = []
 
+    # At least one character from each selected category
     if include_uppercase and string.ascii_uppercase:
         password.append(random.choice(string.ascii_uppercase))
     if include_lowercase and string.ascii_lowercase:
@@ -119,13 +82,16 @@ def generate_password(length=12, include_uppercase=True,
 
 @views.route('/')
 def index():
-    """Entry point: show signup view within ruth.html."""
     return render_template('ruth.html', view='signup')
 
 
 @views.route('/signup', methods=['GET', 'POST'])
 def signup():
-    """Signup page with real user creation and email check."""
+    """Signup page with real email check.
+    User must provide email and password to register. If the email already
+    exists an inline error is shown. On success the user is auto-logged in and
+    redirected to the master password setup page.
+    """
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -150,9 +116,7 @@ def signup():
             (email, hashed_pw)
         )
         conn.commit()
-        # Auto-login newly registered user and send to master password setup
         session['user_id'] = cursor.lastrowid
-        # Ensure master verification flag is reset
         session.pop('master_verified', None)
         conn.close()
         return redirect(url_for('views.master'))
@@ -161,7 +125,12 @@ def signup():
 
 @views.route('/login', methods=['GET', 'POST'])
 def login():
-    """Login page with real authentication."""
+    """LLogin page with real authantications.
+
+    user must provide email and password to login. If either is wrong
+    an inline error is shown. On success the user is redirected to either
+    the master password setup or the master password verification page.
+    """
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -201,9 +170,11 @@ def master():
     Master password creation page.
     User must type twice, hashes and saves.
     """
+    # user must be logged in to set a master password.
     if 'user_id' not in session:
         return redirect(url_for('views.login'))
     if request.method == 'POST':
+        # needs both passwords to match in order to move forward.
         mp1 = request.form.get('master_password')
         mp2 = request.form.get('master_password_confirm')
         errors = {}
@@ -222,6 +193,7 @@ def master():
         if errors:
             return render_template('ruth.html', view='master', errors=errors)
         conn = get_db_connection()
+        # It will store the passwords in hash form instead of normal password
         conn.execute(
             "UPDATE users SET master_password_hash = ? WHERE id = ?",
             (generate_password_hash(mp1), session['user_id'])
@@ -235,7 +207,10 @@ def master():
 
 @views.route('/master-verify', methods=['GET', 'POST'])
 def master_verify():
-    """Prompt user to enter master password to unlock vault after login."""
+    """ask the user for thier master password to unlock the vault.
+    If they are successful to write the correct password they will be
+    redirected to the vault.
+    """
     if 'user_id' not in session:
         return redirect(url_for('views.login'))
 
@@ -277,6 +252,7 @@ def vault():
     if 'user_id' not in session:
         return redirect(url_for('views.login'))
     conn = get_db_connection()
+    # If the user has a master password then they are required verification
     user = conn.execute(
         "SELECT master_password_hash FROM users WHERE id = ?",
         (session['user_id'],)
@@ -287,6 +263,8 @@ def vault():
     ):
         conn.close()
         return redirect(url_for('views.master_verify'))
+
+    # Track currently selected category saved in the session
     if 'category' in request.args:
         category = request.args.get('category', 'All Passwords')
         session['selected_category'] = category
@@ -326,6 +304,7 @@ def vault():
             include_symbols=include_symbols
         )
 
+    # while editing load the existing data to the form
     edit_password_data = None
     if show_edit_entry_popup and edit_password_id:
         edit_password_data = conn.execute(
@@ -333,6 +312,7 @@ def vault():
             (edit_password_id,)
         ).fetchone()
 
+    # Handle form submission for adding or editing a password entry
     if request.method == 'POST':
         title = request.form.get('title')
         username = request.form.get('username')
@@ -344,6 +324,7 @@ def vault():
         user_id = session.get('user_id')
 
         if password_id:
+            # Update existing opetion in the passwords table
             conn.execute(
                 (
                     "UPDATE passwords SET site_name = ?, site_username = ?, "
@@ -362,6 +343,7 @@ def vault():
                 ),
             )
         else:
+            # Create a new option in the passwords table
             cursor = conn.execute(
                 (
                     "INSERT INTO passwords (user_id, site_name, site_username,"
@@ -380,9 +362,11 @@ def vault():
 
         conn.commit()
         conn.close()
+        # save selected category in session and go back to the vault
         session['selected_category'] = selected_category
         return redirect(url_for('views.vault', category=selected_category))
 
+    # read and display password entries for the user and selected category
     user_id = session.get('user_id')
     if category == "All Passwords":
         current_passwords = conn.execute(
@@ -418,7 +402,12 @@ def vault():
 
 @views.route('/delete/<int:id>')
 def delete_password(id):
-    """Delete a password entry by ID."""
+    """Delete a password entry using ID.
+
+    Uses the user's current ID from the session so user can only
+    delete their entries.
+    After they delete an entry they are redirected back to the vault page.
+    """
     conn = get_db_connection()
     current_category = request.args.get(
         'category', session.get('selected_category', 'All Passwords')
@@ -436,7 +425,11 @@ def delete_password(id):
 
 @views.route('/generate-password')
 def generate_password_ajax():
-    """AJAX endpoint for generating passwords dynamically."""
+    """using AJAX to generate password live on the vault page.
+    The codes calls the generated_password function
+    with the selected options and length
+    and returns a JSON response with the new randomly generated password.
+    """
     length = int(request.args.get('length', 12))
     include_uppercase = request.args.get('uppercase', 'true').lower() == 'true'
     include_lowercase = request.args.get('lowercase', 'true').lower() == 'true'
