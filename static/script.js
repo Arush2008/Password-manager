@@ -131,3 +131,29 @@ function togglePassword() {
         toggleIcon.className = 'ri-eye-line';
     }
 }
+
+// changing the appearance of copy button on click
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.copy-btn');
+  if (!btn) return;
+
+  const pwd = btn.getAttribute('data-password') || '';
+  try {
+    await navigator.clipboard.writeText(pwd);
+
+    const icon = btn.querySelector('i');
+    const originalClass = 'fa-regular fa-copy';
+    const successClass = 'fa-solid fa-check';
+
+    // swap to success
+    icon.className = successClass;
+
+    // revert after 1 second
+    setTimeout(() => {
+      icon.className = originalClass;
+    }, 1000);
+
+  } catch (err) {
+    console.error('Copy failed:', err);
+  }
+});
