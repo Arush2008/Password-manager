@@ -84,28 +84,72 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mobile sidebar toggle
     const menuBtn = document.getElementById('menuToggle');
+    const menuBtnTop = document.getElementById('menuToggleTop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebarBackdrop');
     function openSidebar() {
         if (!sidebar) return;
-        sidebar.classList.add('open');
-        if (backdrop) backdrop.hidden = false;
+        if (window.innerWidth <= 750) {
+            sidebar.classList.add('open');
+            if (backdrop) backdrop.hidden = false;
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            sidebar.classList.remove('collapsed');
+        }
         if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
-        if (sidebar) sidebar.setAttribute('aria-hidden', 'false');
-        document.documentElement.style.overflow = 'hidden';
+        if (menuBtnTop) menuBtnTop.setAttribute('aria-expanded', 'true');
+        sidebar.setAttribute('aria-hidden', 'false');
     }
     function closeSidebar() {
         if (!sidebar) return;
-        sidebar.classList.remove('open');
-        if (backdrop) backdrop.hidden = true;
+        if (window.innerWidth <= 750) {
+            sidebar.classList.remove('open');
+            if (backdrop) backdrop.hidden = true;
+            document.documentElement.style.overflow = '';
+            sidebar.setAttribute('aria-hidden', 'true');
+        } else {
+            sidebar.classList.add('collapsed');
+            sidebar.setAttribute('aria-hidden', 'false');
+        }
         if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
-        if (sidebar) sidebar.setAttribute('aria-hidden', 'true');
-        document.documentElement.style.overflow = '';
+        if (menuBtnTop) menuBtnTop.setAttribute('aria-expanded', 'false');
+    }
+    function toggleSidebarDesktopCollapse() {
+        if (!sidebar) return;
+        const collapsed = sidebar.classList.toggle('collapsed');
+        if (collapsed) {
+            sidebar.setAttribute('aria-hidden', 'false');
+        }
     }
     if (menuBtn && sidebar) {
         menuBtn.addEventListener('click', () => {
             const isOpen = sidebar.classList.contains('open');
-            if (isOpen) closeSidebar(); else openSidebar();
+            if (window.innerWidth <= 750) {
+                if (isOpen) closeSidebar(); else openSidebar();
+            } else {
+                toggleSidebarDesktopCollapse();
+            }
+        });
+    }
+    if (menuBtnTop && sidebar) {
+        menuBtnTop.addEventListener('click', () => {
+            const isOpen = sidebar.classList.contains('open');
+            if (window.innerWidth <= 750) {
+                if (isOpen) closeSidebar(); else openSidebar();
+            } else {
+                toggleSidebarDesktopCollapse();
+            }
+        });
+    }
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            if (window.innerWidth <= 750) {
+                const isOpen = sidebar.classList.contains('open');
+                if (isOpen) closeSidebar(); else openSidebar();
+            } else {
+                toggleSidebarDesktopCollapse();
+            }
         });
     }
     if (backdrop) {
@@ -124,13 +168,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Reset state when resizing to desktop
     window.addEventListener('resize', () => {
+        if (!sidebar) return;
         if (window.innerWidth > 750) {
-            // ensure sidebar visible and no backdrop
-            if (sidebar) sidebar.classList.remove('open');
+            // desktop: ensure offcanvas closed and no backdrop
+            sidebar.classList.remove('open');
             if (backdrop) backdrop.hidden = true;
             document.documentElement.style.overflow = '';
+            // keep collapsed state as-is
+        } else {
+            // mobile: remove collapsed, use offcanvas
+            sidebar.classList.remove('collapsed');
         }
     });
+
+    // Live search filtering
+    const searchInput = document.getElementById('vault-search');
+    const noResults = document.getElementById('no-results');
+    function filterCards(q) {
+        const query = (q || '').trim().toLowerCase();
+        const cards = document.querySelectorAll('.password-card');
+        let visibleCount = 0;
+        cards.forEach(card => {
+            const title = card.querySelector('.site-title')?.textContent?.toLowerCase() || '';
+            const subtitle = card.querySelector('.site-subtitle')?.textContent?.toLowerCase() || '';
+            const match = query === '' || title.includes(query) || subtitle.includes(query);
+            card.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+        if (noResults) noResults.style.display = (visibleCount === 0) ? '' : 'none';
+    }
+    const debounceSearch = (fn => {
+        let t; return (v) => { clearTimeout(t); t = setTimeout(() => fn(v), 150); };
+    })(filterCards);
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => debounceSearch(e.target.value));
+    }
+    // No button needed; filtering is live.
 
 
 
@@ -271,6 +344,57 @@ document.addEventListener('DOMContentLoaded', function() {
             window.generateNewPassword();
         });
     });
+
+    // Security Check popup logic
+    const secInput = document.getElementById('seccheck-input');
+    const fill = document.getElementById('meter-fill');
+    const strengthLabel = document.getElementById('strength-label');
+    const entropyLabel = document.getElementById('entropy-label');
+    const timeLabel = document.getElementById('time-label');
+
+    function setMeter(score, entropy, crackTime, label) {
+        if (!fill) return;
+        const percent = Math.min(100, Math.max(0, (score / 4) * 100));
+        fill.style.width = `${percent}%`;
+        // reset previous score color classes
+        fill.classList.remove('score-0','score-1','score-2','score-3','score-4');
+        fill.classList.add(`score-${score}`);
+        if (strengthLabel) strengthLabel.textContent = `Strength: ${label}`;
+        if (entropyLabel) entropyLabel.textContent = `Entropy: ${entropy} bits`;
+        if (timeLabel) timeLabel.textContent = `Crack time: ${crackTime}`;
+    }
+
+    // Debounce helper
+    function debounce(fn, wait) {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...args), wait);
+        };
+    }
+
+    const evaluate = debounce(async function(pw){
+        if (!pw) { setMeter(0, 0, '—', 'Very Weak'); return; }
+        try {
+            const res = await fetch('/password-strength', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw })
+            });
+            const data = await res.json();
+            if (data && data.ok) {
+                setMeter(data.score, data.entropy_bits, data.crack_time_display, data.label);
+            } else {
+                setMeter(0, 0, '—', 'Very Weak');
+            }
+        } catch (e) {
+            console.error('Strength check failed', e);
+        }
+    }, 250);
+
+    if (secInput && fill) {
+        secInput.addEventListener('input', (e) => evaluate(e.target.value));
+    }
 });
 
 // for show/hide password
@@ -285,6 +409,16 @@ function togglePassword() {
         passwordInput.type = 'password';
         toggleIcon.className = 'ri-eye-line';
     }
+}
+
+// Generic visibility toggle for auth fields
+function toggleVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!input || !icon) return;
+    const isPwd = input.type === 'password';
+    input.type = isPwd ? 'text' : 'password';
+    icon.className = isPwd ? 'ri-eye-off-line' : 'ri-eye-line';
 }
 
 // changing the appearance of copy button on click
@@ -311,3 +445,17 @@ document.addEventListener('click', async (e) => {
     console.error('Copy failed:', err);
   }
 });
+
+// toggle visibility for security check input
+function toggleSecCheckPassword() {
+    const inp = document.getElementById('seccheck-input');
+    const icon = document.getElementById('seccheck-toggle-icon');
+    if (!inp || !icon) return;
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'ri-eye-off-line';
+    } else {
+        inp.type = 'password';
+        icon.className = 'ri-eye-line';
+    }
+}

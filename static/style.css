@@ -217,9 +217,8 @@ body.vault_page {
   gap: 20px;
 }
 
-/* mobile-only hamburger visibility */
-.menu-toggle { 
-  display: none;
+.menu-toggle { display: inline-flex; align-items:center; justify-content:center; }
+@media (max-width: 750px) {
 }
 
 /* Logo */
@@ -237,13 +236,30 @@ body.vault_page {
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
 }
 
 .search-bar input {
-  padding: 6px 10px;
+  padding: 6px 30px 6px 10px; /* room for icon on the right */
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+/* Placeholder and icon use the same color */
+.search-bar input::placeholder { 
+  color: #6b7280; 
+  opacity: 1; 
+}
+.search-bar i.fa-magnifying-glass,
+.search-bar i.fa-regular.fa-magnifying-glass {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280; /* match placeholder color */
+  font-size: 14px;
+  pointer-events: none; /* clicks go to input */
 }
 
 .search-bar button {
@@ -275,6 +291,27 @@ body.vault_page {
   z-index: 999;
   display: flex;
   flex-direction: column;
+}
+
+/* Collapsed sidebar for desktop */
+.sidebar.collapsed {
+  width: 64px;
+  padding: 20px 8px;
+}
+.sidebar.collapsed .sidebar_titles { display: none; }
+.sidebar.collapsed .sidebar-text span { display: none; }
+.sidebar.collapsed .bottom-divider { width: 64px; }
+.sidebar.collapsed ~ .main-content { margin-left: 64px; }
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Sidebar toggle should look like just the three bars (no grey pill background) */
+.sidebar-toggle {
+  background-color: transparent;
 }
 
 /* overlay shown when sidebar is open on mobile */
@@ -312,6 +349,13 @@ body.vault_page {
   color: #333;
 }
 
+/* Make the sidebar toggle blend into the sidebar by default (icon-only look) */
+.icon-button.sidebar-toggle {
+  background-color: #ffffff; /* matches sidebar background */
+}
+
+/* Top-right menu toggle removed in UI; keep rule space intentionally empty */
+
 .sidebar-text.active {
   background-color: #f4f2ff;
   color: #8866f7;
@@ -345,10 +389,26 @@ body.vault_page {
   min-width: 160px;
   display: none;
   z-index: 1100;
-  padding: 6px;
+  padding: 0;
 }
 .profile-dropdown.show {
   display: block;
+}
+.profile-dropdown .profile-header {
+  background: #8e6ff7;
+  color: #ffffff;
+  border-radius: 10px 10px 0 0;
+  padding: 12px 14px;
+}
+.profile-dropdown .profile-name {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+}
+.profile-dropdown .profile-email {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 2px;
 }
 .profile-dropdown .dropdown-item {
   display: flex;
@@ -362,6 +422,10 @@ body.vault_page {
 }
 .profile-dropdown .dropdown-item:hover {
   background: #f3f4f6;
+}
+.profile-dropdown .dropdown-item .logout-text,
+.profile-dropdown .dropdown-item .logout-icon {
+  color: #dc2626; /* red */
 }
 
 .sidebar_titles {
@@ -438,6 +502,30 @@ body.vault_page {
   padding: 20px;
 }
 
+/* Header row above password grid */
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.content-header h2 {
+  margin: 0;
+}
+.add-password-btn {
+  background: #8e6ff7;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #7d5df1;
+}
+.add-password-btn:hover {
+  background: #7d5df1;
+}
+
 .password-list {
   margin-top: 12px;
 }
@@ -472,14 +560,14 @@ body.vault_page {
   gap: 10px;
 }
 .first-row {
-  margin-bottom: 2px;
+  margin-bottom: 10px;
 }
 .index-dot {
   width: 26px;
   height: 26px;
   border-radius: 9999px;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #b098ff;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -593,6 +681,8 @@ body.vault_page {
 .fourth-row {
   min-height: 20px;
   align-items: flex-start;
+  margin-top : 7px;
+  margin-bottom: -15px;
 }
 .fifth-row {
   min-height: 20px;
@@ -630,17 +720,24 @@ body.vault_page {
   text-overflow: ellipsis;
 }
 
+.no-results {
+  color: #6b7280;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
 @media (max-width: 1200px) {
   .password-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 750px) {
-  /* show hamburger, hide large search input optionally */
-  .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
-  .search-bar input { max-width: 140px; }
+  /* On mobile, we fully slide sidebar */
+  
+  .search-bar input { 
+    max-width: 140px; 
+  }
 
-  /* Off-canvas sidebar behavior */
   .sidebar {
     transform: translateX(-100%);
     transition: transform 0.25s ease;
@@ -650,11 +747,10 @@ body.vault_page {
   }
   .backdrop[hidden] { display: none; }
 
-  /* content should not reserve sidebar space on mobile */
   .main-content {
     margin-left: 0;
   }
-  
+
   .password-grid {
     grid-template-columns: 1fr;
   }
@@ -965,7 +1061,6 @@ body.vault_page {
 }
 
 /* removed duplicate .popup-2-content block (merged above) */
-
 .popup-2-content h2 {
   font-size: 1.5rem;
   margin-bottom: 20px;
@@ -1170,3 +1265,44 @@ body.vault_page {
   border-color: #f87171 !important;
   box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.15) !important;
 }
+
+/* -------------------------------------------------- Security Check Styles -------------------------------------------------- */
+.strength-meter {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.meter-bar {
+  position: relative;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.meter-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: #ef4444;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.meter-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #374151;
+  font-size: 13px;
+}
+.meter-tips {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* Colors by score (0..4) */
+.score-0 { background: #ef4444 !important; }
+.score-1 { background: #f59e0b !important; }
+.score-2 { background: #eab308 !important; }
+.score-3 { background: #10b981 !important; }
+.score-4 { background: #059669 !important; }

@@ -28,30 +28,24 @@
     <!-- Top Bar -->
     <div class="top_part">
       <div class="top-left">
-        <button class="icon-button menu-toggle" id="menuToggle" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
-          <i class="fa-regular fa-bars"></i>
-        </button>
         <a class="logo-page2">webi</a>
         <div class="search-bar">
-          <input type="text" placeholder="Search..." />
-          <button type="submit">Search</button>
+          <input type="text" id="vault-search" placeholder="Search..." aria-label="Search saved passwords"/><i class="fa-regular fa-magnifying-glass"></i>
         </div>
       </div>
       <div class="top-right">
-        <button class="icon-button notification">
-          <i class="fa-regular fa-bell"></i>
-        </button>
-        <button class="icon-button settings">
-          <i class="fa-regular fa-gear"></i>
-        </button>
         <div class="profile-wrapper">
           <div class="profile-avatar" id="profileButton" aria-haspopup="true" aria-expanded="false">
             <i class="fa-regular fa-user"></i>
           </div>
           <div class="profile-dropdown" id="profileDropdown" role="menu">
+            <div class="profile-header">
+              <div class="profile-name">{{ display_name }}</div>
+              <div class="profile-email">{{ user_email }}</div>
+            </div>
             <a class="dropdown-item" href="{{ url_for('views.logout') }}">
-              <i class="fa-regular fa-right-from-bracket"></i>
-              <span>Logout</span>
+              <i class="fa-regular fa-right-from-bracket logout-icon"></i>
+              <span class="logout-text">Logout</span>
             </a>
           </div>
         </div>
@@ -61,7 +55,12 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar" aria-hidden="false">
       <div class="sidebar-content">
-        <div class="sidebar_titles">Categories</div>
+        <div class="sidebar-header">
+          <div class="sidebar_titles">Categories</div>
+          <button class="icon-button sidebar-toggle" id="sidebarToggle" aria-label="Collapse sidebar">
+            <i class="fa-regular fa-bars"></i>
+          </button>
+        </div>
 
         <!-- Default categories -->
         <a href="{{url_for('views.vault', category='All Passwords')}}">
@@ -123,32 +122,38 @@
         <a href="{{ url_for('views.vault', category=category, popup='add-new-entry') }}">
           <div class="sidebar-text">
             <i class="fa-regular fa-circle-plus"></i>
-            <span>Add New Entry</span>
+            <span>Add New Password</span>
           </div>
         </a>
 
-        <div class="sidebar-text">
-          <i class="fa-regular fa-shield-check"></i>
-          <span>Security Check</span>
-        </div>
+        <a href="{{ url_for('views.vault', category=category, popup='security-check') }}">
+          <div class="sidebar-text">
+            <i class="fa-regular fa-shield-check"></i>
+            <span>Security Check</span>
+          </div>
+        </a>
 
-        <div class="sidebar-text">
-          <i class="ri-refresh-line"></i>
-          <span>Sync Now</span>
-        </div>
       </div>
     </div>
   <div class="backdrop" id="sidebarBackdrop" hidden></div>
 
     <!-- Main Content -->
     <div class="main-content">
-      {% if category == 'All Passwords' %}
-        <h2>All Passwords</h2>
-      {% else %}
-        <h2>{{ category }} Passwords</h2>
-      {% endif %}
+      <div class="content-header">
+        <div class="content-title">
+          {% if category == 'All Passwords' %}
+            <h2>All Passwords</h2>
+          {% else %}
+            <h2>{{ category }} Passwords</h2>
+          {% endif %}
+        </div>
+        <a class="add-password-btn" href="{{ url_for('views.vault', category=category, popup='add-new-entry') }}" title="Add a new password">+ Add Password</a>
+      </div>
       
-      <!-- Display saved passwords -->
+  <!-- Client-side search no-results placeholder -->
+  <p id="no-results" class="no-results" style="display:none;">No matching passwords.</p>
+
+  <!-- Display saved passwords -->
       {% if passwords %}
         <div class="password-list password-grid">
           {% for password in passwords %}
@@ -268,29 +273,44 @@
         <div>
           <form method="POST" action="{{ url_for('views.vault') }}">
             <label for="title" class="text-label">Website/App</label><br>
-            <input type="text" id="title" name="title" class="text-input" maxlength="15" required><br>
+            <input type="text" id="title" name="title" class="text-input" maxlength="50" required value="{{ (form_values.title if form_values and form_values.title) or '' }}"><br>
+            {% if errors and errors.vault and errors.vault.title %}
+              <div class="field-error">{{ errors.vault.title }}</div>
+            {% endif %}
 
             <label for="username" class="text-label">Username/Email</label><br>
-            <input type="text" id="username" name="username" class="text-input" maxlength="15" required><br>
+            <input type="text" id="username" name="username" class="text-input" maxlength="50" required value="{{ (form_values.username if form_values and form_values.username) or '' }}"><br>
+            {% if errors and errors.vault and errors.vault.username %}
+              <div class="field-error">{{ errors.vault.username }}</div>
+            {% endif %}
 
             <label for="password" class="text-label">Password</label><br>
-            <input type="password" id="password" name="password" class="text-input" minlength="8" required><br>
+            <input type="password" id="password" name="password" class="text-input" minlength="8" required value="{{ (form_values.password if form_values and form_values.password) or '' }}"><br>
+            {% if errors and errors.vault and errors.vault.password %}
+              <div class="field-error">{{ errors.vault.password }}</div>
+            {% endif %}
 
             <label for="url" class="text-label">Website URL (optional)</label><br>
-            <input type="url" id="url" name="url" class="text-input" placeholder="https://example.com"><br>
+            <input type="url" id="url" name="url" class="text-input" placeholder="https://example.com" value="{{ (form_values.url if form_values and form_values.url) or '' }}"><br>
+            {% if errors and errors.vault and errors.vault.url %}
+              <div class="field-error">{{ errors.vault.url }}</div>
+            {% endif %}
 
             <label for="category" class="text-label">Category</label><br>
             <select id="category" name="category" class="text-input">
               {% for c in default_categories if c != 'All Passwords' %}
-                <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+                <option value="{{ c }}" {% if (form_values and form_values.category==c) or (not form_values and category == c) %}selected{% endif %}>{{ c }}</option>
               {% endfor %}
               {% for c in custom_categories %}
-                <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+                <option value="{{ c }}" {% if (form_values and form_values.category==c) or (not form_values and category == c) %}selected{% endif %}>{{ c }}</option>
               {% endfor %}
             </select><br>
 
             <label for="notes" class="text-label">Notes (optional)</label><br>
-            <textarea id="notes" name="notes" class="text-input" maxlength="50"></textarea><br>
+            <textarea id="notes" name="notes" class="text-input" maxlength="200">{{ (form_values.notes if form_values and form_values.notes) or '' }}</textarea><br>
+            {% if errors and errors.vault and errors.vault.notes %}
+              <div class="field-error">{{ errors.vault.notes }}</div>
+            {% endif %}
 
             <input type="submit" id="save-password-btn" name="save-password-btn" value="Save Password">
             <a href="{{ url_for('views.vault', category=category) }}" class="cancel-btn">Cancel</a>
@@ -312,10 +332,16 @@
             <input type="hidden" name="password_id" value="{{ edit_password_data['id'] }}">
             
             <label for="title" class="text-label">Website/App</label><br>
-            <input type="text" id="title" name="title" class="text-input" value="{{ edit_password_data['site_name'] }}" maxlength="15" required><br>
+            <input type="text" id="title" name="title" class="text-input" value="{{ edit_password_data['site_name'] }}" maxlength="50" required><br>
+            {% if errors and errors.vault and errors.vault.title %}
+              <div class="field-error">{{ errors.vault.title }}</div>
+            {% endif %}
 
             <label for="username" class="text-label">Username/Email</label><br>
-            <input type="text" id="username" name="username" class="text-input" value="{{ edit_password_data['site_username'] }}" maxlength="15" required><br>
+            <input type="text" id="username" name="username" class="text-input" value="{{ edit_password_data['site_username'] }}" maxlength="50" required><br>
+            {% if errors and errors.vault and errors.vault.username %}
+              <div class="field-error">{{ errors.vault.username }}</div>
+            {% endif %}
 
             <label for="password" class="text-label">Password</label><br>
             <div class="password-field-container">
@@ -324,9 +350,15 @@
                 <i class="ri-eye-line" id="toggle-icon"></i>
               </button>
             </div><br>
+            {% if errors and errors.vault and errors.vault.password %}
+              <div class="field-error">{{ errors.vault.password }}</div>
+            {% endif %}
 
             <label for="url" class="text-label">Website URL (optional)</label><br>
             <input type="url" id="url" name="url" class="text-input" value="{{ edit_password_data['url'] or '' }}" placeholder="https://example.com"><br>
+            {% if errors and errors.vault and errors.vault.url %}
+              <div class="field-error">{{ errors.vault.url }}</div>
+            {% endif %}
 
             <label for="category" class="text-label">Category</label><br>
             <select id="category" name="category" class="text-input">
@@ -339,7 +371,10 @@
             </select><br>
 
             <label for="notes" class="text-label">Notes (optional)</label><br>
-            <textarea id="notes" name="notes" class="text-input" maxlength="50">{{ edit_password_data['notes'] or '' }}</textarea><br>
+            <textarea id="notes" name="notes" class="text-input" maxlength="200">{{ edit_password_data['notes'] or '' }}</textarea><br>
+            {% if errors and errors.vault and errors.vault.notes %}
+              <div class="field-error">{{ errors.vault.notes }}</div>
+            {% endif %}
 
             <input type="submit" id="save-password-btn" name="save-password-btn" value="Update Password">
             <a href="{{ url_for('views.vault', category=category) }}" class="cancel-btn">Cancel</a>
@@ -391,6 +426,40 @@
         });
       });
     </script>
+    {% endif %}
+
+    <!------------------------------------- Security Check Popup ------------------------------------->
+    {% if show_security_check_popup %}
+    <div class="popup-2-overlay">
+      <div class="popup-2-content">
+        <h2>Password Security Check</h2>
+        <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
+
+        <div class="text-label">Enter a password to evaluate</div>
+        <div class="password-field-container" style="margin-top:6px;">
+          <input type="password" id="seccheck-input" class="text-input" placeholder="Type a password..." autocomplete="new-password" />
+          <button type="button" class="password-toggle-link" onclick="toggleSecCheckPassword()">
+            <i class="ri-eye-line" id="seccheck-toggle-icon"></i>
+          </button>
+        </div>
+
+        <!-- Strength meter -->
+        <div class="strength-meter" aria-hidden="false">
+          <div class="meter-bar">
+            <span class="meter-fill" id="meter-fill" style="width:0%"></span>
+          </div>
+          <div class="meter-legend">
+            <span id="strength-label">Strength: —</span>
+            <span id="entropy-label">Entropy: —</span>
+            <span id="time-label">Crack time: —</span>
+          </div>
+        </div>
+
+        <p class="meter-tips">
+          Tips: use at least 12 chars, mix upper/lower, digits and symbols, and avoid common words or patterns.
+        </p>
+      </div>
+    </div>
     {% endif %}
 
   </body>

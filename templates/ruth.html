@@ -39,9 +39,14 @@
 							<div class="field-error">{{ errors.signup.email }}</div>
 						{% endif %}
 
-			<label class="text-label" for="password">Password</label>
-						<input class="text-input {% if errors and errors.signup and errors.signup.password %}input-error{% endif %}"
-									 id="password" name="password" type="password" placeholder="Create a password" required />
+						<label class="text-label" for="password">Password</label>
+						<div class="password-field-container">
+							<input class="text-input {% if errors and errors.signup and errors.signup.password %}input-error{% endif %}"
+										 id="password" name="password" type="password" placeholder="Create a password" required />
+							<button type="button" class="password-toggle-link" onclick="toggleVisibility('password','toggle-icon-signup')">
+								<i class="ri-eye-line" id="toggle-icon-signup"></i>
+							</button>
+						</div>
 						{% if errors and errors.signup and errors.signup.password %}
 							<div class="field-error">{{ errors.signup.password }}</div>
 						{% endif %}
@@ -64,9 +69,14 @@
 							<div class="field-error">{{ errors.login.email }}</div>
 						{% endif %}
 
-			<label class="text-label" for="login_password">Password</label>
-						<input class="text-input {% if errors and errors.login and errors.login.password %}input-error{% endif %}"
-									 id="login_password" name="password" type="password" placeholder="Your password" required />
+						<label class="text-label" for="login_password">Password</label>
+						<div class="password-field-container">
+							<input class="text-input {% if errors and errors.login and errors.login.password %}input-error{% endif %}"
+										 id="login_password" name="password" type="password" placeholder="Your password" required />
+							<button type="button" class="password-toggle-link" onclick="toggleVisibility('login_password','toggle-icon-login')">
+								<i class="ri-eye-line" id="toggle-icon-login"></i>
+							</button>
+						</div>
 						{% if errors and errors.login and errors.login.password %}
 							<div class="field-error">{{ errors.login.password }}</div>
 						{% endif %}
@@ -80,16 +90,26 @@
 		{% if view == 'master' %}
 		<h2 class="auth-title">Set Your Master Password</h2>
 				<form method="post" action="{{ url_for('views.master') }}" class="auth-form">
-			<label class="text-label" for="master_password">Master Password</label>
-						<input class="text-input {% if errors and errors.master and errors.master.master_password %}input-error{% endif %}"
-									 id="master_password" name="master_password" type="password" placeholder="Create a master password" required />
+						<label class="text-label" for="master_password">Master Password</label>
+						<div class="password-field-container">
+							<input class="text-input {% if errors and errors.master and errors.master.master_password %}input-error{% endif %}"
+										 id="master_password" name="master_password" type="password" placeholder="Create a master password" required />
+							<button type="button" class="password-toggle-link" onclick="toggleVisibility('master_password','toggle-icon-master1')">
+								<i class="ri-eye-line" id="toggle-icon-master1"></i>
+							</button>
+						</div>
 						{% if errors and errors.master and errors.master.master_password %}
 							<div class="field-error">{{ errors.master.master_password }}</div>
 						{% endif %}
 
-			<label class="text-label" for="master_password_confirm">Confirm Master Password</label>
-						<input class="text-input {% if errors and errors.master and errors.master.master_password_confirm %}input-error{% endif %}"
-									 id="master_password_confirm" name="master_password_confirm" type="password" placeholder="Confirm master password" required />
+						<label class="text-label" for="master_password_confirm">Confirm Master Password</label>
+						<div class="password-field-container">
+							<input class="text-input {% if errors and errors.master and errors.master.master_password_confirm %}input-error{% endif %}"
+										 id="master_password_confirm" name="master_password_confirm" type="password" placeholder="Confirm master password" required />
+							<button type="button" class="password-toggle-link" onclick="toggleVisibility('master_password_confirm','toggle-icon-master2')">
+								<i class="ri-eye-line" id="toggle-icon-master2"></i>
+							</button>
+						</div>
 						{% if errors and errors.master and errors.master.master_password_confirm %}
 							<div class="field-error">{{ errors.master.master_password_confirm }}</div>
 						{% endif %}
