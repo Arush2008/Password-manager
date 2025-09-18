@@ -15,14 +15,60 @@ from werkzeug.security import generate_password_hash, check_password_hash
 views = Blueprint('views', __name__)
 
 
+@views.before_app_request
+def enforce_idle_timeout():
+    """Clear session after an absolute 20-minute window since login.
+    No sliding refresh; once 20 minutes elapse, the session is cleared.
+    """
+    from datetime import datetime, timedelta
+    # only track for authenticated sessions
+    if 'user_id' in session:
+        now = datetime.utcnow()
+        started = session.get('start_time')
+        try:
+            started_dt = (
+                datetime.fromisoformat(started)
+                if isinstance(started, str) else None
+            )
+        except Exception:
+            started_dt = None
+        # default to 20 minutes if not resolvable from app config
+        timeout = timedelta(minutes=20)
+        try:
+            # get from current_app config if available
+            from flask import current_app
+            timeout = current_app.config.get(
+                'PERMANENT_SESSION_LIFETIME', timeout
+            )
+        except Exception:
+            pass
+
+        if started_dt and (now - started_dt) > timeout:
+            session.clear()
+            # no redirect; route handlers will see cleared session
+
+
 def get_db_connection():
     """Establish and return a database connection."""
     conn = sqlite3.connect("password_manager.db")
     conn.row_factory = sqlite3.Row
     conn.commit()
 
+    # Ensure categories table exists
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            UNIQUE(user_id, name)
+        )
+        """
+    )
+    conn.commit()
+
     # This checks to ensure newer columns exist even if
-    # the table was created by an older version of the app.
+    # the table was created by an older version.
     cur = conn.execute("PRAGMA table_info(passwords)")
     cols = {row[1] for row in cur.fetchall()}
     if "category" not in cols:
@@ -116,8 +162,12 @@ def signup():
             (email, hashed_pw)
         )
         conn.commit()
+        session.permanent = True
         session['user_id'] = cursor.lastrowid
         session.pop('master_verified', None)
+        # absolute timer start
+        from datetime import datetime
+        session['start_time'] = datetime.utcnow().isoformat()
         conn.close()
         return redirect(url_for('views.master'))
     return render_template('ruth.html', view='signup')
@@ -156,8 +206,11 @@ def login():
                 values={'email': email}
             )
         conn.close()
+        session.permanent = True
         session['user_id'] = user['id']
         session.pop('master_verified', None)
+        from datetime import datetime
+        session['start_time'] = datetime.utcnow().isoformat()
         if not user['master_password_hash']:
             return redirect(url_for('views.master'))
         return redirect(url_for('views.master_verify'))
@@ -243,6 +296,13 @@ def master_verify():
     return render_template('index.html')
 
 
+@views.route('/logout')
+def logout():
+    """Clear the session and redirect to login."""
+    session.clear()
+    return redirect(url_for('views.login'))
+
+
 @views.route('/vault', methods=['GET', 'POST'])
 def vault():
     """
@@ -264,6 +324,18 @@ def vault():
         conn.close()
         return redirect(url_for('views.master_verify'))
 
+    # Load user categories (built-in defaults + custom)
+    user_id = session.get('user_id')
+    # ensure default categories exist in UI, not necessarily in DB
+    default_categories = [
+        'All Passwords', 'Personal', 'Work', 'Finance', 'Gaming'
+    ]
+    user_categories = conn.execute(
+        "SELECT name FROM categories WHERE user_id = ? ORDER BY name ASC",
+        (user_id,)
+    ).fetchall()
+    custom_categories = [row['name'] for row in user_categories]
+
     # Track currently selected category saved in the session
     if 'category' in request.args:
         category = request.args.get('category', 'All Passwords')
@@ -274,6 +346,7 @@ def vault():
     show_password_generator_popup = popup_type == 'password-generator'
     show_new_entry_popup = popup_type == 'add-new-entry'
     show_edit_entry_popup = popup_type == 'edit-entry'
+    show_add_category_popup = popup_type == 'add-category'
     edit_password_id = request.args.get('id')
     show_password = request.args.get('show_password') == 'true'
 
@@ -367,7 +440,6 @@ def vault():
         return redirect(url_for('views.vault', category=selected_category))
 
     # read and display password entries for the user and selected category
-    user_id = session.get('user_id')
     if category == "All Passwords":
         current_passwords = conn.execute(
             "SELECT * FROM passwords WHERE user_id = ? ORDER BY id DESC",
@@ -384,9 +456,12 @@ def vault():
     return render_template(
         'vault.html',
         category=category,
+        default_categories=default_categories,
+        custom_categories=custom_categories,
         show_password_generator_popup=show_password_generator_popup,
         show_new_entry_popup=show_new_entry_popup,
         show_edit_entry_popup=show_edit_entry_popup,
+        show_add_category_popup=show_add_category_popup,
         edit_password_data=edit_password_data,
         edit_password_id=edit_password_id,
         show_password=show_password,
@@ -400,6 +475,42 @@ def vault():
     )
 
 
+@views.route('/categories', methods=['GET'])
+def list_categories():
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+    conn = get_db_connection()
+    rows = conn.execute(
+        "SELECT name FROM categories WHERE user_id = ? ORDER BY name ASC",
+        (session['user_id'],)
+    ).fetchall()
+    conn.close()
+    return jsonify({'categories': [r['name'] for r in rows]})
+
+
+@views.route('/categories', methods=['POST'])
+def add_category():
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+    name = (request.form.get('name') or '').strip()
+    if not name:
+        return jsonify({'ok': False, 'error': 'Category name required'}), 400
+    if name in ['All Passwords']:
+        return jsonify({'ok': False, 'error': 'Reserved category name'}), 400
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            "INSERT OR IGNORE INTO categories (user_id, name) VALUES (?, ?)",
+            (session['user_id'], name)
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    # Also set as selected to land on it after add
+    session['selected_category'] = name
+    return jsonify({'ok': True, 'name': name})
+
+
 @views.route('/delete/<int:id>')
 def delete_password(id):
     """Delete a password entry using ID.
@@ -408,6 +519,10 @@ def delete_password(id):
     delete their entries.
     After they delete an entry they are redirected back to the vault page.
     """
+    # Require login
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+
     conn = get_db_connection()
     current_category = request.args.get(
         'category', session.get('selected_category', 'All Passwords')
@@ -430,6 +545,10 @@ def generate_password_ajax():
     with the selected options and length
     and returns a JSON response with the new randomly generated password.
     """
+    # redirect to login if not logged in
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+
     length = int(request.args.get('length', 12))
     include_uppercase = request.args.get('uppercase', 'true').lower() == 'true'
     include_lowercase = request.args.get('lowercase', 'true').lower() == 'true'

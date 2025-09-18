@@ -28,7 +28,7 @@
     <!-- Top Bar -->
     <div class="top_part">
       <div class="top-left">
-        <a href="{{ url_for('views.index') }}" class="logo-page2">webi</a>
+        <a class="logo-page2">webi</a>
         <div class="search-bar">
           <input type="text" placeholder="Search..." />
           <button type="submit">Search</button>
@@ -41,7 +41,17 @@
         <button class="icon-button settings">
           <i class="fa-regular fa-gear"></i>
         </button>
-        <div class="profile-avatar"><i class="fa-regular fa-user"></i></div>
+        <div class="profile-wrapper">
+          <div class="profile-avatar" id="profileButton" aria-haspopup="true" aria-expanded="false">
+            <i class="fa-regular fa-user"></i>
+          </div>
+          <div class="profile-dropdown" id="profileDropdown" role="menu">
+            <a class="dropdown-item" href="{{ url_for('views.logout') }}">
+              <i class="fa-regular fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -50,6 +60,7 @@
       <div class="sidebar-content">
         <div class="sidebar_titles">Categories</div>
 
+        <!-- Default categories -->
         <a href="{{url_for('views.vault', category='All Passwords')}}">
           <div class="sidebar-text {%if category == 'All Passwords'%}active{% endif %}">
             <i class="fa-regular fa-lock-keyhole"></i>
@@ -57,38 +68,41 @@
           </div>
         </a>
 
-        <a href="{{url_for('views.vault', category='Personal')}}">
-          <div class="sidebar-text {%if category == 'Personal'%}active{% endif %}">
-            <i class="ri-user-line"></i>
-            <span>Personal</span>
-          </div>
-        </a>
+        {% for c in default_categories if c != 'All Passwords' %}
+          <a href="{{ url_for('views.vault', category=c) }}">
+            <div class="sidebar-text {% if category == c %}active{% endif %}">
+              {% if c == 'Personal' %}
+                <i class="ri-user-line"></i>
+              {% elif c == 'Work' %}
+                <i class="fa-regular fa-briefcase"></i>
+              {% elif c == 'Finance' %}
+                <i class="fa-regular fa-wallet"></i>
+              {% elif c == 'Gaming' %}
+                <i class="fa-regular fa-gamepad-modern"></i>
+              {% else %}
+                <i class="fa-regular fa-folder"></i>
+              {% endif %}
+              <span>{{ c }}</span>
+            </div>
+          </a>
+        {% endfor %}
 
-        <a href="{{url_for('views.vault', category='Work')}}">
-          <div class="sidebar-text {%if category == 'Work'%}active{% endif %}">
-            <i class="fa-regular fa-briefcase"></i>
-            <span>Work</span>
-          </div>
-        </a>
+        <!-- Custom categories -->
+        {% for c in custom_categories %}
+          <a href="{{ url_for('views.vault', category=c) }}">
+            <div class="sidebar-text {% if category == c %}active{% endif %}">
+              <i class="fa-regular fa-folder"></i>
+              <span>{{ c }}</span>
+            </div>
+          </a>
+        {% endfor %}
 
-        <a href="{{url_for('views.vault', category='Finance')}}">
-          <div class="sidebar-text {%if category == 'Finance'%}active{% endif %}">
-            <i class="fa-regular fa-wallet"></i>
-            <span>Finance</span>
-          </div>
-        </a>
-
-        <a href="{{url_for('views.vault', category='Gaming')}}">
-          <div class="sidebar-text {%if category == 'Gaming'%}active{% endif %}">
-            <i class="fa-regular fa-gamepad-modern"></i>
-            <span>Gaming</span>
-          </div>
-        </a>
-
+        <a href="{{ url_for('views.vault', category=category, popup='add-category') }}">
         <div class="sidebar-text">
           <i class="fa-solid fa-plus"></i>
           <span>Add Category</span>
         </div>
+        </a>
 
         <!-- Invisible divider between Categories and Quick Actions -->
         <hr class="invisible-divider" />
@@ -126,40 +140,67 @@
     <div class="main-content">
       {% if category == 'All Passwords' %}
         <h2>All Passwords</h2>
-      {% elif category == 'Personal' %}
-        <h2>Personal Passwords</h2>
-      {% elif category == 'Work' %}
-        <h2>Work Passwords</h2>
-      {% elif category == 'Finance' %}
-        <h2>Finance Passwords</h2>
-      {% elif category == 'Gaming' %}
-        <h2>Gaming Passwords</h2>
       {% else %}
-        <h2>Unknown Category</h2>
+        <h2>{{ category }} Passwords</h2>
       {% endif %}
       
       <!-- Display saved passwords -->
       {% if passwords %}
-        <div class="password-list">
+        <div class="password-list password-grid">
           {% for password in passwords %}
+            {% set plen = password.site_password|length %}
             <div class="password-card">
-              <div class="password-header">
-                <h3>{{ password.site_name }}</h3>
-                <span class="password-category">{{ password['category'] }}</span>
+              <!-- Row 1: index left, category right -->
+              <div class="card-row first-row">
+                <span class="index-dot">{{ loop.index }}</span>
+                <span class="category-chip">{{ password['category'] }}</span>
               </div>
-              <div class="password-details">
-                <p><strong>Username:</strong> {{ password.site_username }}</p>
-                <p><strong>Password:</strong> {{ "•" * password.site_password|length }}</p>
-                {% if password.url %}
-                  <p><strong>URL:</strong> <a href="{{ password.url }}" target="_blank">{{ password.url }}</a></p>
-                {% endif %}
-                {% if password.notes %}
-                  <p><strong>Notes:</strong> {{ password.notes }}</p>
+
+              <!-- Row 2: title/subtitle left, actions right -->
+              <div class="card-row second-row">
+                <div class="title-block">
+                  <div class="site-title">{{ password.site_name }}</div>
+                  <div class="site-subtitle">{{ password.site_username }}</div>
+                </div>
+                <div class="card-actions">
+                  <a href="{{ url_for('views.vault', category=category, popup='edit-entry', id=password['id']) }}" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
+                  <a class="btn-delete" href="{{ url_for('views.delete_password', id=password['id'], category=category) }}" title="Delete" onclick="return confirm('Are you sure you want to delete this password?');"><i class="fa-regular fa-trash"></i></a>
+                </div>
+              </div>
+
+              <!-- Row 3: password field with eye inside, copy on right -->
+              <div class="card-row third-row">
+                <div class="password-secret" data-password="{{ password.site_password|e }}">
+                  <span class="pw-dots">{{ "•" * plen }}</span>
+                  <span class="pw-text" style="display:none;"></span>
+                  <button type="button" class="pw-visibility-btn" aria-label="Show password">
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
+                <button type="button" class="copy-btn-card" aria-label="Copy password">
+                  <i class="fa-regular fa-clipboard"></i>
+                </button>
+              </div>
+
+              <!-- Row 4: link (fixed height row; blank if none) -->
+              <div class="card-row fourth-row">
+                {% if password['url'] %}
+                  <div class="link-line">
+                    <span class="link-label">Link:</span>
+                    <a class="link-text" href="{{ password['url']|e }}" target="_blank" rel="noopener noreferrer">{{ password['url'] }}</a>
+                  </div>
+                {% else %}
+                  <div class="link-line"><span class="link-label"></span><span class="link-text"></span></div>
                 {% endif %}
               </div>
-              <div class="password-actions">
-                <a href="{{ url_for('views.vault', category=category, popup='edit-entry', id=password['id']) }}"><i class="fa-regular fa-pen-to-square"></i></a>
-                <a class="btn-delete" href="{{ url_for('views.delete_password', id=password['id'], category=category) }}" onclick="return confirm('Are you sure you want to delete this password?');"><i class="fa-regular fa-trash"></i></a>
+
+              <!-- Row 5: notes line (fixed height row; blank if none) -->
+              <div class="card-row fifth-row">
+                {% if password['notes'] %}
+                  <div class="notes-text">Note: {{ password['notes'] }}</div>
+                {% else %}
+                  <div class="notes-text"></div>
+                {% endif %}
               </div>
             </div>
           {% endfor %}
@@ -236,10 +277,12 @@
 
             <label for="category" class="text-label">Category</label><br>
             <select id="category" name="category" class="text-input">
-              <option value="Personal" {% if category == 'Personal' %}selected{% endif %}>Personal</option>
-              <option value="Work" {% if category == 'Work' %}selected{% endif %}>Work</option>
-              <option value="Finance" {% if category == 'Finance' %}selected{% endif %}>Finance</option>
-              <option value="Gaming" {% if category == 'Gaming' %}selected{% endif %}>Gaming</option>
+              {% for c in default_categories if c != 'All Passwords' %}
+                <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+              {% for c in custom_categories %}
+                <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
             </select><br>
 
             <label for="notes" class="text-label">Notes (optional)</label><br>
@@ -283,10 +326,12 @@
 
             <label for="category" class="text-label">Category</label><br>
             <select id="category" name="category" class="text-input">
-              <option value="Personal" {% if edit_password_data['category']=='Personal' %}selected{% endif %}>Personal</option>
-              <option value="Work" {% if edit_password_data['category']=='Work' %}selected{% endif %}>Work</option>
-              <option value="Finance" {% if edit_password_data['category']=='Finance' %}selected{% endif %}>Finance</option>
-              <option value="Gaming" {% if edit_password_data['category']=='Gaming' %}selected{% endif %}>Gaming</option>
+              {% for c in default_categories if c != 'All Passwords' %}
+                <option value="{{ c }}" {% if edit_password_data['category']==c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+              {% for c in custom_categories %}
+                <option value="{{ c }}" {% if edit_password_data['category']==c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
             </select><br>
 
             <label for="notes" class="text-label">Notes (optional)</label><br>
@@ -298,6 +343,50 @@
         </div>
       </div>
     </div>
+    {% endif %}
+
+    <!------------------------------------- Add Category Popup ------------------------------------->
+    {% if show_add_category_popup %}
+    <div class="popup-2-overlay">
+      <div class="popup-2-content">
+        <h2>Add Category</h2>
+        <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
+        <div>
+          <form id="add-category-form">
+            <label for="cat-name" class="text-label">Category Name</label><br>
+            <input type="text" id="cat-name" name="name" class="text-input" maxlength="20" required><br>
+            <button type="submit" id="save-category-btn" class="primary-btn" style="width:auto;">Add</button>
+            <a href="{{ url_for('views.vault', category=category) }}" class="cancel-btn">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function(){
+        const form = document.getElementById('add-category-form');
+        if (!form) return;
+        form.addEventListener('submit', async function(e){
+          e.preventDefault();
+          const fd = new FormData(form);
+          try {
+            const res = await fetch("{{ url_for('views.add_category') }}", {
+              method: 'POST',
+              body: fd
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok) {
+              alert(data.error || 'Failed to add category');
+              return;
+            }
+            // go to the new category
+            const newCat = data.name;
+            window.location.href = `{{ url_for('views.vault') }}?category=${encodeURIComponent(newCat)}`;
+          } catch (err) {
+            alert('Error adding category');
+          }
+        });
+      });
+    </script>
     {% endif %}
 
   </body>

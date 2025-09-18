@@ -317,6 +317,40 @@ body.vault_page {
   cursor: pointer;
 }
 
+/* Profile dropdown */
+.profile-wrapper {
+  position: relative;
+}
+.profile-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  min-width: 160px;
+  display: none;
+  z-index: 1100;
+  padding: 6px;
+}
+.profile-dropdown.show {
+  display: block;
+}
+.profile-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: #253142;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.profile-dropdown .dropdown-item:hover {
+  background: #f3f4f6;
+}
+
 .sidebar_titles {
   font-size: 11px;
   font-weight: 600;
@@ -392,71 +426,207 @@ body.vault_page {
 }
 
 .password-list {
-  display: grid;
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.password-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease;
-}
-
-.password-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.password-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #f3f4f6;
-  padding-bottom: 8px;
-}
-
-.password-header h3 {
-  margin: 0;
-  color: #1f2937;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.password-category {
-  background: #8e6ff7;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.password-details {
   margin-top: 12px;
 }
-
-.password-details p {
-  margin: 8px 0;
-  color: #4b5563;
-  font-size: 14px;
+.password-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 16px;
 }
 
-.password-details strong {
-  color: #1f2937;
-  font-weight: 500;
-}
 
-.password-details a {
-  color: #8e6ff7;
+/* Card styles */
+.password-card {
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display:flex;
+  flex-direction: column;
+  gap: 14px; /* slightly more space between rows for cleanliness */
+  min-height: 200px;
+  max-width: 520px;
+}
+.password-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.first-row {
+  margin-bottom: 2px;
+}
+.index-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+.category-chip {
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #e0e7ff;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.second-row {
+  gap: 10px;
+}
+.title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.site-title {
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.site-subtitle {
+  color: #6b7280;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-actions a {
+  color: #6b7280;
   text-decoration: none;
 }
+.card-actions a:hover {
+  color: #374151;
+}
 
-.password-details a:hover {
+.third-row {
+  gap: 10px;
+}
+.password-secret {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  height: 35px;
+  flex: 1;
+  max-width: 460px;
+  padding: 0 40px 0 10px;
+  position: relative;
+}
+.pw-dots {
+  font-family: 'Courier New', monospace;
+  color: #111827;
+}
+.pw-text {
+  font-family: 'Courier New', monospace;
+  color: #111827;
+}
+.pw-visibility-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.pw-visibility-btn:hover {
+  color: #374151;
+}
+.copy-btn-card {
+  border: none;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  border-radius: 8px;
+  width: 38px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.copy-btn-card:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.fourth-row {
+  min-height: 20px;
+  align-items: flex-start;
+}
+.fifth-row {
+  min-height: 20px;
+  align-items: flex-start;
+}
+.link-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+.link-label {
+  color: #6b7280;
+  font-size: 12px;
+}
+.link-text {
+  color: #4b5563;
+  font-size: 12px;
+  text-decoration: none;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.link-text:hover {
+  color: #111827;
   text-decoration: underline;
+}
+.notes-text {
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1100px) {
+  .password-grid {
+    grid-template-columns: repeat(2, minmax(500px, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .password-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* -------------------------------------------------- Password Generator Popup Styles -------------------------------------------------- */
@@ -717,6 +887,7 @@ body.vault_page {
 
 
 
+/* Consolidated .popup-2-content */
 .popup-2-content {
   background-color: white;
   border-radius: 20px;
@@ -729,6 +900,12 @@ body.vault_page {
   box-sizing: border-box;
   max-height: 90vh;
   overflow-y: auto;
+  background: #fff; 
+  border-radius: 16px;
+  padding: 28px 32px;
+  max-width: 460px; 
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  animation: popup-appear 0.25s ease-out;
 }
 
 .popup-2-overlay {
@@ -744,16 +921,7 @@ body.vault_page {
   z-index: 1000;
 }
 
-.popup-2-content {
-  background: #fff;
-  border-radius: 16px;
-  padding: 28px 32px;
-  width: 90%;
-  max-width: 460px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  box-sizing: border-box;
-  animation: popup-appear 0.25s ease-out;
-}
+/* removed duplicate .popup-2-content block (merged above) */
 
 .popup-2-content h2 {
   font-size: 1.5rem;

@@ -1,4 +1,109 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Row-level show/hide and copy interactions
+    document.querySelectorAll('.password-secret').forEach((wrap) => {
+        const dots = wrap.querySelector('.pw-dots');
+        const text = wrap.querySelector('.pw-text');
+        const showBtn = wrap.querySelector('.pw-visibility-btn');
+        const copyBtn = wrap.querySelector('.copy-btn-min');
+        const secret = wrap.getAttribute('data-password') || '';
+        if (showBtn) {
+            showBtn.addEventListener('click', () => {
+                const showing = text.style.display !== 'none' && text.textContent.length > 0;
+                if (showing) {
+                    text.style.display = 'none';
+                    dots.style.display = '';
+                    showBtn.innerHTML = '<i class="fa-regular fa-eye"></i>';
+                } else {
+                    text.textContent = secret;
+                    text.style.display = '';
+                    dots.style.display = 'none';
+                    showBtn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
+                }
+            });
+        }
+        if (copyBtn) {
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(secret);
+                    const icon = copyBtn.querySelector('i');
+                    const prev = icon.className;
+                    icon.className = 'fa-solid fa-check';
+                    setTimeout(() => { icon.className = prev; }, 1000);
+                } catch (e) {
+                    console.error('Copy failed', e);
+                }
+            });
+        }
+    });
+
+    // New card-level copy button outside the secret box
+    document.querySelectorAll('.password-card').forEach((card) => {
+        const wrap = card.querySelector('.password-secret');
+        const copyBtn = card.querySelector('.copy-btn-card');
+        if (!wrap || !copyBtn) return;
+        const secret = wrap.getAttribute('data-password') || '';
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(secret);
+                const icon = copyBtn.querySelector('i');
+                const prev = icon.className;
+                icon.className = 'fa-solid fa-check';
+                setTimeout(() => { icon.className = prev; }, 1000);
+            } catch (e) {
+                console.error('Copy failed', e);
+            }
+        });
+    });
+    // Profile dropdown toggle
+    const profileBtn = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = profileDropdown.classList.contains('show');
+            profileDropdown.classList.toggle('show', !isOpen);
+            profileBtn.setAttribute('aria-expanded', String(!isOpen));
+        });
+        // Close on outside click
+        document.addEventListener('click', () => {
+            profileDropdown.classList.remove('show');
+            profileBtn.setAttribute('aria-expanded', 'false');
+        });
+        // Prevent closing when clicking inside
+        profileDropdown.addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    // Absolute timeout (20 minutes) — no reset on activity
+    // Matches server: absolute PERMANENT_SESSION_LIFETIME = 20 minutes
+    const ABS_TIMEOUT_MS = 20 * 60 * 1000;
+    if (document.body.classList.contains('vault_page')) {
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, ABS_TIMEOUT_MS);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const slider = document.getElementById('myRange');
     const lengthDisplay = document.getElementById('length-display');
     const passwordInput = document.getElementById('generated-password');
