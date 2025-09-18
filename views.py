@@ -54,6 +54,34 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     conn.commit()
 
+    # Ensure core tables exist
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            master_password_hash TEXT
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS passwords (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            site_name TEXT NOT NULL,
+            site_username TEXT,
+            site_password TEXT,
+            url TEXT,
+            notes TEXT,
+            category TEXT DEFAULT 'Personal',
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+        """
+    )
+    conn.commit()
+
     # Ensure categories table exists
     conn.execute(
         """
