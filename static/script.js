@@ -82,6 +82,56 @@ document.addEventListener('DOMContentLoaded', function() {
         }, ABS_TIMEOUT_MS);
     }
 
+    // Mobile sidebar toggle
+    const menuBtn = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    function openSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.add('open');
+        if (backdrop) backdrop.hidden = false;
+        if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
+        if (sidebar) sidebar.setAttribute('aria-hidden', 'false');
+        document.documentElement.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.remove('open');
+        if (backdrop) backdrop.hidden = true;
+        if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+        if (sidebar) sidebar.setAttribute('aria-hidden', 'true');
+        document.documentElement.style.overflow = '';
+    }
+    if (menuBtn && sidebar) {
+        menuBtn.addEventListener('click', () => {
+            const isOpen = sidebar.classList.contains('open');
+            if (isOpen) closeSidebar(); else openSidebar();
+        });
+    }
+    if (backdrop) {
+        backdrop.addEventListener('click', closeSidebar);
+    }
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSidebar();
+    });
+    // Close when clicking a link in sidebar (for better UX on mobile)
+    if (sidebar) {
+        sidebar.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link) closeSidebar();
+        });
+    }
+    // Reset state when resizing to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 750) {
+            // ensure sidebar visible and no backdrop
+            if (sidebar) sidebar.classList.remove('open');
+            if (backdrop) backdrop.hidden = true;
+            document.documentElement.style.overflow = '';
+        }
+    });
+
 
 
 

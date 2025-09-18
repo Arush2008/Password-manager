@@ -28,6 +28,9 @@
     <!-- Top Bar -->
     <div class="top_part">
       <div class="top-left">
+        <button class="icon-button menu-toggle" id="menuToggle" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+          <i class="fa-regular fa-bars"></i>
+        </button>
         <a class="logo-page2">webi</a>
         <div class="search-bar">
           <input type="text" placeholder="Search..." />
@@ -56,7 +59,7 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar" aria-hidden="false">
       <div class="sidebar-content">
         <div class="sidebar_titles">Categories</div>
 
@@ -135,6 +138,7 @@
         </div>
       </div>
     </div>
+  <div class="backdrop" id="sidebarBackdrop" hidden></div>
 
     <!-- Main Content -->
     <div class="main-content">
