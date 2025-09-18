@@ -905,6 +905,58 @@ def add_category():
     return jsonify({'ok': True, 'name': name})
 
 
+@views.route('/categories/<path:name>', methods=['DELETE'])
+def delete_category(name):
+    """Delete a custom category for the logged-in user.
+    - Reserved/default categories cannot be deleted.
+    - Passwords using this category are reassigned to 'Personal'.
+    """
+    if 'user_id' not in session:
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+    name = (name or '').strip()
+    if not name:
+        return jsonify({'ok': False, 'error': 'Category name required'}), 400
+    reserved = {'All Passwords', 'Personal', 'Work', 'Finance', 'Gaming'}
+    if name in reserved:
+        return jsonify({
+            'ok': False,
+            'error': 'Cannot delete default category'
+        }), 400
+
+    conn = get_db_connection()
+    user_id = session.get('user_id')
+    # Check if category exists for this user
+    row = conn.execute(
+        "SELECT id FROM categories WHERE user_id = ? AND name = ?",
+        (user_id, name)
+    ).fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Category not found'}), 404
+
+    # Reassign passwords in this category to 'Personal'
+    conn.execute(
+        (
+            "UPDATE passwords SET category = 'Personal' "
+            "WHERE user_id = ? AND category = ?"
+        ),
+        (user_id, name)
+    )
+    # Delete category record
+    conn.execute(
+        "DELETE FROM categories WHERE user_id = ? AND name = ?",
+        (user_id, name)
+    )
+    conn.commit()
+    conn.close()
+
+    # If the user was viewing this category, bounce them to All Passwords
+    if session.get('selected_category') == name:
+        session['selected_category'] = 'All Passwords'
+
+    return jsonify({'ok': True})
+
+
 @views.route('/delete/<int:id>')
 def delete_password(id):
     """Delete a password entry using ID.

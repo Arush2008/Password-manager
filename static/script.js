@@ -163,7 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (sidebar) {
         sidebar.addEventListener('click', (e) => {
             const link = e.target.closest('a');
-            if (link) closeSidebar();
+            if (link) {
+                // Only auto-close on mobile for smoother UX; avoid desktop flicker
+                if (window.innerWidth <= 750) closeSidebar();
+            }
         });
     }
     // Reset state when resizing to desktop
@@ -204,6 +207,41 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('input', (e) => debounceSearch(e.target.value));
     }
     // No button needed; filtering is live.
+
+    // Delete custom category on click of the trash icon (hover button)
+    document.querySelectorAll('.cat-delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const cat = btn.getAttribute('data-category');
+            if (!cat) return;
+            if (!confirm(`Delete category "${cat}"? Passwords will be moved to Personal.`)) return;
+            try {
+                const res = await fetch(`/categories/${encodeURIComponent(cat)}`, { method: 'DELETE' });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.ok) {
+                    alert(data.error || 'Failed to delete category');
+                    return;
+                }
+                // After deletion, navigate to All Passwords
+                window.location.href = `${window.location.pathname}?category=${encodeURIComponent('All Passwords')}`;
+            } catch (err) {
+                console.error('Delete category failed', err);
+                alert('Error deleting category');
+            }
+        });
+    });
+
+    // Make the entire custom category row clickable (except the delete button)
+    document.querySelectorAll('.sidebar-text.with-delete').forEach(row => {
+        row.addEventListener('click', (e) => {
+            if (e.target.closest('.cat-delete-btn')) return; // let delete handler run
+            const link = row.querySelector('.sidebar-item-link');
+            if (link && link.href) {
+                window.location.href = link.href;
+            }
+        });
+    });
 
 
 

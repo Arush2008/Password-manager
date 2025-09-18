@@ -91,12 +91,15 @@
 
         <!-- Custom categories -->
         {% for c in custom_categories %}
-          <a href="{{ url_for('views.vault', category=c) }}">
-            <div class="sidebar-text {% if category == c %}active{% endif %}">
-              <i class="fa-regular fa-folder"></i>
-              <span>{{ c }}</span>
+            <div class="sidebar-text {% if category == c %}active{% endif %} with-delete">
+              <a href="{{ url_for('views.vault', category=c) }}" class="sidebar-item-link">
+                <i class="fa-regular fa-folder"></i>
+                <span>{{ c }}</span>
+              </a>
+              <button class="cat-delete-btn" title="Delete category" data-category="{{ c }}" aria-label="Delete {{ c }}">
+                <i class="fa-regular fa-trash"></i>
+              </button>
             </div>
-          </a>
         {% endfor %}
 
         <a href="{{ url_for('views.vault', category=category, popup='add-category') }}">
@@ -215,7 +218,7 @@
           {% endfor %}
         </div>
       {% else %}
-        <p>No passwords saved in this category yet. <a href="{{ url_for('views.vault', category=category, popup='add-new-entry') }}">Add your first password entry!</a></p>
+        <p>No passwords saved in this category yet. <a href="{{ url_for('views.vault', category=category, popup='add-new-entry') }}">Add your first password password!</a></p>
       {% endif %}
     </div>
 
@@ -264,11 +267,11 @@
     </div>
     {% endif %}
 
-    <!------------------------------------- Add New Entry Popup ------------------------------------->
+    <!------------------------------------- Add New Password Popup ------------------------------------->
     {% if show_new_entry_popup %}
     <div class="popup-2-overlay">
       <div class="popup-2-content">
-        <h2>Add New Entry</h2>
+        <h2>Add New Password</h2>
         <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
         <div>
           <form method="POST" action="{{ url_for('views.vault') }}">
@@ -325,7 +328,7 @@
     {% if show_edit_entry_popup %}
     <div class="popup-2-overlay">
       <div class="popup-2-content">
-        <h2>Edit Entry</h2>
+        <h2>Edit Password</h2>
         <a href="{{ url_for('views.vault', category=category) }}" class="close-btn">&times;</a>
         <div>
           <form method="POST" action="{{ url_for('views.vault') }}">

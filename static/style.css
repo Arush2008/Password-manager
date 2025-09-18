@@ -492,6 +492,37 @@ body.vault_page {
   padding-bottom: 20px;
 }
 
+/* Custom category row with hover delete */
+/* Sidebar link area flexes; delete button sits to the right inside the same box */
+.sidebar-text.with-delete { position: relative; }
+.sidebar-text.with-delete .sidebar-item-link {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.sidebar-text.with-delete .cat-delete-btn {
+  margin-left: auto;
+  visibility: hidden;
+  background: transparent;
+  color: #9ca3af;
+  border: none;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+.sidebar-text.with-delete:hover .cat-delete-btn { visibility: visible; }
+.sidebar-text.with-delete .cat-delete-btn i { font-size: 12px; }
+.sidebar-text.with-delete .cat-delete-btn:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 
 
 /* -------------------------------------------------- password area Styles -------------------------------------------------- */
